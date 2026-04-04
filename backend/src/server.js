@@ -15,10 +15,23 @@ const limiter = rateLimit({
   message: { success: false, error: 'Too many requests, please try again later.' }
 });
 
+const allowedOrigins = [
+  'http://localhost:5173',
+  'http://localhost:3000',
+  'https://myswooop-marketing.vercel.app',
+];
+if (process.env.FRONTEND_URL) allowedOrigins.push(process.env.FRONTEND_URL);
+
 app.use(cors({
-  origin: process.env.NODE_ENV === 'production'
-    ? process.env.FRONTEND_URL
-    : ['http://localhost:5173', 'http://localhost:3000'],
+  origin: (origin, callback) => {
+    // Allow requests with no origin (mobile apps, curl, Render health checks)
+    if (!origin) return callback(null, true);
+    // Allow any vercel.app subdomain (covers preview deployments too)
+    if (origin.endsWith('.vercel.app') || allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+    callback(new Error('Not allowed by CORS'));
+  },
   credentials: true
 }));
 

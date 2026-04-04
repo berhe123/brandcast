@@ -1,7 +1,9 @@
 import axios from 'axios'
 
+const BACKEND_URL = import.meta.env.VITE_API_URL || 'https://myswooop-backend.onrender.com'
+
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL ? `${import.meta.env.VITE_API_URL}/api` : '/api',
+  baseURL: `${BACKEND_URL}/api`,
   timeout: 60000,
   headers: { 'Content-Type': 'application/json' }
 })
