@@ -4,7 +4,7 @@ const BACKEND_URL = import.meta.env.VITE_API_URL || 'https://myswooop-backend.on
 
 const api = axios.create({
   baseURL: `${BACKEND_URL}/api`,
-  timeout: 60000,
+  timeout: 120000,
   headers: { 'Content-Type': 'application/json' }
 })
 
