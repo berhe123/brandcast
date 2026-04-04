@@ -59,13 +59,7 @@ export default function ContentPreview({ platform, content, loading }) {
           )}
         </div>
 
-        {/* FB Actions */}
-        <div className="border-t border-gray-700/50 mx-4" />
-        <div className="px-4 py-2 flex justify-around">
-          {['👍 Like', '💬 Comment', '↗️ Share'].map(a => (
-            <button key={a} className="text-gray-400 text-xs py-1.5 px-3 hover:bg-gray-700/40 rounded-lg transition-colors">{a}</button>
-          ))}
-        </div>
+
       </div>
     )
   }
@@ -160,20 +154,7 @@ export default function ContentPreview({ platform, content, loading }) {
             ) : (
               <EmptyState platform="Twitter / X" />
             )}
-            {/* Tweet actions */}
-            <div className="flex items-center gap-6 mt-3">
-              {[
-                { icon: '💬', count: '12' },
-                { icon: '🔁', count: '34' },
-                { icon: '❤️', count: '156' },
-                { icon: '📊', count: '1.4K' },
-              ].map(({ icon, count }) => (
-                <button key={count} className="flex items-center gap-1.5 text-gray-500 hover:text-sky-400 transition-colors text-xs">
-                  <span>{icon}</span>
-                  <span>{count}</span>
-                </button>
-              ))}
-            </div>
+
           </div>
         </div>
       </div>
@@ -215,13 +196,7 @@ export default function ContentPreview({ platform, content, loading }) {
           )}
         </div>
 
-        {/* LI Actions */}
-        <div className="border-t border-indigo-500/15 mx-4" />
-        <div className="px-4 py-2.5 flex justify-around">
-          {['👍 Like', '💬 Comment', '🔁 Repost', '📤 Send'].map(a => (
-            <button key={a} className="text-gray-400 text-xs py-1.5 px-2 hover:bg-gray-700/40 rounded-lg transition-colors">{a}</button>
-          ))}
-        </div>
+
       </div>
     )
   }
@@ -260,21 +235,7 @@ export default function ContentPreview({ platform, content, loading }) {
           )}
         </div>
 
-        {/* TT Actions */}
-        <div className="border-t border-teal-500/15 mx-4" />
-        <div className="px-4 py-2.5 flex items-center gap-5">
-          {[
-            { icon: '❤️', count: '12.5K' },
-            { icon: '💬', count: '843' },
-            { icon: '🔖', count: '2.1K' },
-            { icon: '🚀', count: 'Share' },
-          ].map(({ icon, count }) => (
-            <button key={count} className="flex flex-col items-center gap-0.5 text-gray-400 hover:text-teal-400 transition-colors">
-              <span className="text-lg">{icon}</span>
-              <span className="text-xs">{count}</span>
-            </button>
-          ))}
-        </div>
+
       </div>
     )
   }
