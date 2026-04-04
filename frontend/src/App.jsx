@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React from 'react'
 import { Routes, Route, Navigate } from 'react-router-dom'
 import { Toaster } from 'react-hot-toast'
 import { AppProvider } from './context/AppContext'
@@ -7,14 +7,8 @@ import Dashboard from './pages/Dashboard'
 import Generate from './pages/Generate'
 import History from './pages/History'
 import Templates from './pages/Templates'
-import { checkHealth } from './services/api'
 
 function App() {
-  // Ping the backend on load so Render wakes up before the user generates content
-  useEffect(() => {
-    checkHealth().catch(() => {})
-  }, [])
-
   return (
     <AppProvider>
       <Toaster
