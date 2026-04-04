@@ -313,10 +313,9 @@ const buildEnglishContent = ({ platform, topic, tone, contentType, targetAudienc
       `\n\n${e.check} Verified refurbished\n${e.check} 97% customer satisfaction\n${e.check} 1M+ happy customers\n${e.check} Free shipping over €30`,
     ];
 
-    const midLine = pick(td.middles);
     const cta = pick(td.ctas);
 
-    return `${pick(hooks)}\n\n${midLine}${pick(benefits)}\n\n${cta}`;
+    return `${pick(hooks)}${pick(benefits)}\n\n${cta}`;
   }
 
   // Facebook: balanced, community-focused
@@ -393,12 +392,13 @@ const generateMockContent = ({ platform, topic, tone, contentType, targetAudienc
     content = content.replace(/[\u{1F300}-\u{1F9FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]|♻️|✅|☑️|✔️|⚡|🚀|💚|🌱/gu, '').replace(/  +/g, ' ').trim();
   }
 
-  // Enforce char limits
-  if (platform === 'twitter' && content.length > 280) {
-    content = content.slice(0, 277) + '...';
-  }
-  if (platform === 'tiktok' && content.length > 300) {
-    content = content.slice(0, 297) + '...';
+  // Enforce platform char limits for all platforms
+  const platformLimits = { facebook: 500, instagram: 300, twitter: 280, linkedin: 600, tiktok: 300 };
+  const charLimit = platformLimits[platform];
+  if (charLimit && content.length > charLimit) {
+    const trimmed = content.slice(0, charLimit - 1);
+    const lastBreak = Math.max(trimmed.lastIndexOf('\n'), trimmed.lastIndexOf(' '));
+    content = (lastBreak > charLimit * 0.6 ? trimmed.slice(0, lastBreak) : trimmed).trimEnd() + '…';
   }
 
   return content;
