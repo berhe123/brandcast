@@ -105,7 +105,7 @@ export default function Generate() {
     tone: 'friendly',
     contentType: 'post',
     targetAudience: 'general',
-    language: 'english',
+    language: 'german',
     includeHashtags: true,
     includeEmoji: true,
     customInstructions: ''
@@ -298,8 +298,8 @@ export default function Generate() {
                   onChange={e => setForm(prev => ({ ...prev, language: e.target.value }))}
                   className="input-field text-sm"
                 >
-                  <option value="english">English</option>
                   <option value="german">German (Deutsch)</option>
+                  <option value="english">English</option>
                 </select>
               </div>
             </div>
