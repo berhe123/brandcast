@@ -31,7 +31,7 @@ const platforms = [
     bg: 'bg-pink-500/10',
     border: 'border-pink-500/30',
     activeRing: 'ring-pink-500/50',
-    limit: 300
+    limit: 500
   },
   {
     id: 'twitter',

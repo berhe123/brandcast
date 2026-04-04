@@ -393,7 +393,7 @@ const generateMockContent = ({ platform, topic, tone, contentType, targetAudienc
   }
 
   // Enforce platform char limits for all platforms
-  const platformLimits = { facebook: 500, instagram: 300, twitter: 280, linkedin: 600, tiktok: 300 };
+  const platformLimits = { facebook: 500, instagram: 500, twitter: 280, linkedin: 600, tiktok: 300 };
   const charLimit = platformLimits[platform];
   if (charLimit && content.length > charLimit) {
     const trimmed = content.slice(0, charLimit - 1);
