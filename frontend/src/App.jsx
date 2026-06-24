@@ -2,11 +2,23 @@ import React from 'react'
 import { Routes, Route, Navigate } from 'react-router-dom'
 import { Toaster } from 'react-hot-toast'
 import { AppProvider } from './context/AppContext'
+import { useAuth } from './context/AuthContext'
 import Layout from './components/Layout'
+import RequireAuth from './components/RequireAuth'
+import Landing from './pages/Landing'
+import Login from './pages/Login'
 import Dashboard from './pages/Dashboard'
 import Generate from './pages/Generate'
-import History from './pages/History'
 import Templates from './pages/Templates'
+import Schedule from './pages/Schedule'
+import Analytics from './pages/Analytics'
+import Team from './pages/Team'
+
+// Gate a route to admins only.
+function AdminOnly({ children }) {
+  const { isAdmin } = useAuth()
+  return isAdmin ? children : <Navigate to="/app/dashboard" replace />
+}
 
 function App() {
   return (
@@ -33,13 +45,19 @@ function App() {
         }}
       />
       <Routes>
-        <Route path="/" element={<Layout />}>
-          <Route index element={<Navigate to="/dashboard" replace />} />
+        <Route path="/" element={<Landing />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/app" element={<RequireAuth><Layout /></RequireAuth>}>
+          <Route index element={<Navigate to="/app/dashboard" replace />} />
           <Route path="dashboard" element={<Dashboard />} />
-          <Route path="generate" element={<Generate />} />
-          <Route path="history" element={<History />} />
+          <Route path="brand/:brandId/content" element={<Generate />} />
+          <Route path="brand/:brandId/edit" element={<Dashboard />} />
           <Route path="templates" element={<Templates />} />
+          <Route path="schedule" element={<Schedule />} />
+          <Route path="analytics" element={<Analytics />} />
+          <Route path="team" element={<AdminOnly><Team /></AdminOnly>} />
         </Route>
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </AppProvider>
   )

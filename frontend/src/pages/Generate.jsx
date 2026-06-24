@@ -1,16 +1,34 @@
 import React, { useState, useEffect, useCallback } from 'react'
-import { useSearchParams, useLocation } from 'react-router-dom'
+import { useParams, useLocation, useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   Facebook, Instagram, Twitter, Linkedin, Wand2, Copy, CheckCircle,
   RefreshCw, ChevronDown, Sparkles, AlertCircle, Hash, Smile,
-  Cpu, Zap, KeyRound
+  Cpu, Zap, KeyRound, BookOpen, CalendarClock, Send, ExternalLink
 } from 'lucide-react'
 import { TikTokIcon } from '../components/PlatformIcons'
 import toast from 'react-hot-toast'
-import { generateContent, getAiStatus } from '../services/api'
+import { generateContent, getAiStatus, createScheduled } from '../services/api'
 import { useApp } from '../context/AppContext'
 import ContentPreview from '../components/ContentPreview'
+import RoutingPanel from '../components/RoutingPanel'
+
+// Build the brand context the AI uses, from the selected brand.
+const brandInfoFrom = (brand) => ({
+  name: brand?.name || 'the brand',
+  description: brand?.description || '',
+  website: brand?.website || brand?.blog || '',
+  voice: '',
+  tagline: '',
+  values: [],
+})
+
+// Default the scheduler to ~1 hour from now, formatted for <input type=datetime-local>.
+const defaultScheduleTime = () => {
+  const d = new Date(Date.now() + 60 * 60 * 1000)
+  d.setMinutes(d.getMinutes() - d.getTimezoneOffset())
+  return d.toISOString().slice(0, 16)
+}
 
 const platforms = [
   {
@@ -63,6 +81,16 @@ const platforms = [
     activeRing: 'ring-teal-500/50',
     limit: 300
   },
+  {
+    id: 'blog',
+    label: 'Blog',
+    icon: BookOpen,
+    color: 'text-orange-400',
+    bg: 'bg-orange-500/10',
+    border: 'border-orange-500/30',
+    activeRing: 'ring-orange-500/50',
+    limit: 2000
+  },
 ]
 
 const tones = [
@@ -95,12 +123,22 @@ const audiences = [
 ]
 
 export default function Generate() {
-  const [searchParams, setSearchParams] = useSearchParams()
-  const { addToHistory } = useApp()
+  const { brandId } = useParams()
+  const navigate = useNavigate()
+  const { addToHistory, brands } = useApp()
   const location = useLocation()
 
+  const brand = brands.find((b) => b.id === brandId)
+
+  useEffect(() => {
+    if (!brand) {
+      navigate('/app/dashboard')
+      toast.error('Brand not found')
+    }
+  }, [brand, navigate])
+
   const [form, setForm] = useState({
-    platform: searchParams.get('platform') || 'facebook',
+    platform: 'facebook',
     topic: '',
     tone: 'friendly',
     contentType: 'post',
@@ -113,10 +151,14 @@ export default function Generate() {
 
   const [loading, setLoading] = useState(false)
   const [result, setResult] = useState(null)
+  const [meta, setMeta] = useState(null) // { routing, drafts } from the AI router
   const [copied, setCopied] = useState(false)
   const [charCount, setCharCount] = useState(0)
   const [showAdvanced, setShowAdvanced] = useState(false)
-  const [aiMode, setAiMode] = useState(null) // null | 'claude' | 'demo'
+  const [aiMode, setAiMode] = useState(null) // null | 'live' | 'demo'
+  const [showSchedule, setShowSchedule] = useState(false)
+  const [scheduleAt, setScheduleAt] = useState(defaultScheduleTime())
+  const [scheduling, setScheduling] = useState(false)
 
   const currentPlatform = platforms.find(p => p.id === form.platform)
 
@@ -151,17 +193,26 @@ export default function Generate() {
     }
     setLoading(true)
     setResult(null)
+    setMeta(null)
     try {
-      const res = await generateContent(form)
+      // The AI router always runs in 'auto' mode: it picks the single best model
+      // — or fuses two complementary models — for the best result automatically.
+      const res = await generateContent({ ...form, routingMode: 'auto', brandInfo: brandInfoFrom(brand) })
       setResult(res.data.content)
+      setMeta({ routing: res.data.routing, drafts: res.data.drafts })
       addToHistory(res.data)
-      toast.success('Content generated successfully!')
+      const routed = res.data.routing
+      toast.success(
+        routed?.mode === 'hybrid'
+          ? `Fused ${routed.primary.label} + ${routed.partner.label}`
+          : `Generated with ${routed?.primary?.label || 'AI'}`
+      )
     } catch (err) {
       toast.error(err.message || 'Failed to generate content. Check your API key.')
     } finally {
       setLoading(false)
     }
-  }, [form, addToHistory])
+  }, [form, brand, addToHistory])
 
   const handleCopy = () => {
     if (!result) return
@@ -177,6 +228,27 @@ export default function Generate() {
     handleGenerate()
   }
 
+  const handleSchedule = async () => {
+    if (!result) return
+    setScheduling(true)
+    try {
+      await createScheduled({
+        platform: form.platform,
+        content: result,
+        scheduledFor: new Date(scheduleAt).toISOString(),
+        topic: form.topic.trim(),
+        brandName: brand?.name || '',
+        routing: meta?.routing || null,
+      })
+      toast.success('Scheduled! Track it on the Schedule page.')
+      setShowSchedule(false)
+    } catch (err) {
+      toast.error(err.message || 'Could not schedule post')
+    } finally {
+      setScheduling(false)
+    }
+  }
+
   const charLimitColor = charCount > currentPlatform?.limit
     ? 'text-red-400'
     : charCount > currentPlatform?.limit * 0.85
@@ -186,7 +258,7 @@ export default function Generate() {
   return (
     <div className="space-y-6">
       {/* AI Mode Banner */}
-      {aiMode === 'claude' && (
+      {aiMode === 'live' && (
         <motion.div
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
@@ -194,13 +266,29 @@ export default function Generate() {
         >
           <Cpu size={16} className="text-violet-400 flex-shrink-0" />
           <p className="text-violet-300 text-sm font-medium">
-            Claude AI is active — generating with real intelligence
+            Multi-model AI router active — routing each task to the best model
           </p>
           <span className="ml-auto badge bg-violet-500/20 text-violet-300 border-violet-500/30">
             <Zap size={10} /> Live AI
           </span>
         </motion.div>
       )}
+
+      {/* Brand header — name + context */}
+      {brand && (
+        <div className="card p-4 flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-600 to-cyan-500 flex items-center justify-center text-white font-bold flex-shrink-0">
+            {brand.name?.slice(0, 2).toUpperCase()}
+          </div>
+          <div className="min-w-0">
+            <p className="font-semibold text-white truncate">{brand.name}</p>
+            <p className="text-xs text-slate-500 truncate">
+              {brand.description || 'Create AI content for this brand'}
+            </p>
+          </div>
+        </div>
+      )}
+
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
         {/* LEFT: Form */}
         <div className="space-y-5">
@@ -402,19 +490,34 @@ export default function Generate() {
 
         {/* RIGHT: Preview */}
         <div className="space-y-4">
+          {/* AI Router decision */}
+          {meta?.routing && <RoutingPanel routing={meta.routing} drafts={meta.drafts} />}
+
           <div className="card p-5 sticky top-0">
             <div className="flex items-center justify-between mb-4">
               <h3 className="font-semibold text-white flex items-center gap-2">
                 <span className="text-violet-400 text-sm">Preview</span>
-                {currentPlatform && (
-                  <span className={`badge ${
+                {currentPlatform && (() => {
+                  const channelUrl = brand?.[form.platform] || brand?.website || ''
+                  const cls = `badge ${
                     form.platform === 'facebook' ? 'badge-facebook' :
                     form.platform === 'instagram' ? 'badge-instagram' : 'badge-twitter'
-                  }`}>
-                    <currentPlatform.icon size={12} />
-                    {currentPlatform.label}
-                  </span>
-                )}
+                  }`
+                  const inner = (
+                    <>
+                      <currentPlatform.icon size={12} />
+                      {currentPlatform.label}
+                      {channelUrl && <ExternalLink size={10} className="opacity-70" />}
+                    </>
+                  )
+                  return channelUrl ? (
+                    <a href={channelUrl} target="_blank" rel="noopener noreferrer"
+                      title={`Open ${brand?.name || 'brand'} on ${currentPlatform.label}`}
+                      className={`${cls} hover:brightness-125 transition`}>
+                      {inner}
+                    </a>
+                  ) : <span className={cls}>{inner}</span>
+                })()}
               </h3>
               {result && (
                 <div className="flex items-center gap-2">
@@ -429,14 +532,44 @@ export default function Generate() {
                     <RefreshCw size={14} className={loading ? 'animate-spin' : ''} />
                     Redo
                   </button>
+                  <button onClick={() => setShowSchedule(v => !v)} className="btn-ghost py-1.5 px-3 text-xs text-violet-300">
+                    <CalendarClock size={14} />
+                    Schedule
+                  </button>
                 </div>
               )}
             </div>
+
+            {/* Inline scheduler */}
+            <AnimatePresence>
+              {result && showSchedule && (
+                <motion.div
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: 'auto', opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  className="overflow-hidden"
+                >
+                  <div className="flex items-center gap-2 mb-4 p-3 rounded-xl bg-slate-800/50 border border-slate-700/60">
+                    <CalendarClock size={16} className="text-violet-400 flex-shrink-0" />
+                    <input
+                      type="datetime-local"
+                      value={scheduleAt}
+                      onChange={(e) => setScheduleAt(e.target.value)}
+                      className="input-field text-sm py-1.5 flex-1"
+                    />
+                    <button onClick={handleSchedule} disabled={scheduling} className="btn-primary py-1.5 px-3 text-xs whitespace-nowrap">
+                      {scheduling ? <div className="spinner" /> : <><Send size={13} /> Queue post</>}
+                    </button>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
 
             <ContentPreview
               platform={form.platform}
               content={result}
               loading={loading}
+              brand={brand}
             />
 
             {result && charCount > currentPlatform?.limit && (
