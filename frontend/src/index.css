@@ -10,85 +10,134 @@
   }
 
   body {
-    @apply bg-slate-950 text-slate-100 antialiased;
+    @apply text-slate-900 antialiased;
     font-family: 'Inter', system-ui, sans-serif;
-    background-image: 
-      radial-gradient(ellipse at top left, rgba(124, 58, 237, 0.08) 0%, transparent 50%),
-      radial-gradient(ellipse at bottom right, rgba(6, 182, 212, 0.06) 0%, transparent 50%);
+    color: #0f172a;
+    background-color: #dae1e3;
+    /* Light "studio" base — #dae1e3 with soft green & teal light. */
+    background-image:
+      radial-gradient(900px circle at 12% -10%, rgba(34, 197, 94, 0.16) 0%, transparent 55%),
+      radial-gradient(820px circle at 90% 4%, rgba(13, 148, 136, 0.12) 0%, transparent 55%),
+      linear-gradient(180deg, #e6ebec 0%, #dae1e3 45%, #cfd8da 100%);
     background-attachment: fixed;
+    -webkit-tap-highlight-color: transparent;
   }
 
   ::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
+    width: 8px;
+    height: 8px;
   }
 
   ::-webkit-scrollbar-track {
-    @apply bg-slate-900;
+    @apply bg-slate-200/60;
   }
 
   ::-webkit-scrollbar-thumb {
-    @apply bg-slate-700 rounded-full;
+    @apply bg-slate-300 rounded-full;
   }
 
   ::-webkit-scrollbar-thumb:hover {
-    @apply bg-slate-500;
+    @apply bg-slate-400;
   }
 
   ::selection {
-    @apply bg-purple-600/40 text-white;
+    @apply bg-green-500/30 text-slate-900;
   }
 }
 
 @layer components {
   .card {
-    @apply bg-slate-900/80 border border-slate-800/80 rounded-2xl backdrop-blur-sm;
+    @apply bg-white/80 border border-slate-200/90 rounded-2xl backdrop-blur-sm shadow-sm;
   }
 
   .card-hover {
     @apply card transition-all duration-300 
-           hover:border-purple-500/40 hover:shadow-lg hover:shadow-purple-500/10 
+           hover:border-green-500/50 hover:shadow-lg hover:shadow-green-500/10 
            hover:-translate-y-0.5 cursor-pointer;
   }
 
   .btn-primary {
-    @apply relative overflow-hidden bg-gradient-to-r from-violet-600 to-cyan-500 
+    @apply relative overflow-hidden bg-gradient-to-r from-green-600 to-emerald-500 
            text-white font-semibold px-6 py-3 rounded-xl
-           hover:from-violet-500 hover:to-cyan-400 
+           hover:from-green-500 hover:to-emerald-400 
            transition-all duration-300
-           disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:from-violet-600 disabled:hover:to-cyan-500
-           shadow-lg shadow-violet-500/25 hover:shadow-violet-500/40
+           disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:from-green-600 disabled:hover:to-emerald-500
+           shadow-lg shadow-green-600/25 hover:shadow-green-600/40
            active:scale-95 flex items-center justify-center gap-2;
   }
 
   .btn-secondary {
-    @apply bg-slate-800/80 text-slate-200 font-medium px-6 py-3 rounded-xl 
-           border border-slate-700/80 hover:bg-slate-700 hover:border-slate-600 
+    @apply bg-white text-slate-800 font-medium px-6 py-3 rounded-xl 
+           border border-slate-300 hover:bg-slate-50 hover:border-slate-400 
            transition-all duration-200 active:scale-95
            flex items-center justify-center gap-2;
   }
 
   .btn-ghost {
-    @apply text-slate-400 hover:text-slate-100 hover:bg-slate-800/60 
+    @apply text-slate-600 hover:text-slate-900 hover:bg-black/5 
            px-4 py-2 rounded-lg transition-all duration-200 font-medium
            flex items-center justify-center gap-2;
   }
 
   .btn-danger {
-    @apply text-red-400 hover:text-red-300 hover:bg-red-900/20 
+    @apply text-red-600 hover:text-red-700 hover:bg-red-50 
            px-3 py-2 rounded-lg transition-all duration-200
            flex items-center justify-center gap-1;
   }
 
   .input-field {
-    @apply w-full bg-slate-800/60 border border-slate-700/80 rounded-xl px-4 py-3 
-           text-slate-100 placeholder-slate-500
-           focus:outline-none focus:ring-2 focus:ring-violet-500/40 focus:border-violet-500/60
+    @apply w-full bg-white border border-slate-300 rounded-xl px-4 py-3 
+           text-slate-900 placeholder-slate-400
+           focus:outline-none focus:ring-2 focus:ring-green-500/40 focus:border-green-500/60
            transition-all duration-200 resize-none;
   }
 
+  /* ─── Light theme (home + login): #dae1e3 surfaces, black text, green accents ── */
+  .btn-green {
+    @apply relative overflow-hidden bg-gradient-to-r from-green-600 to-emerald-500
+           text-white font-semibold px-6 py-3 rounded-xl
+           hover:from-green-500 hover:to-emerald-400
+           transition-all duration-300
+           disabled:opacity-50 disabled:cursor-not-allowed
+           shadow-lg shadow-green-600/25 hover:shadow-green-600/40
+           active:scale-95 flex items-center justify-center gap-2;
+  }
+
+  .btn-light {
+    @apply bg-white text-slate-800 font-medium px-6 py-3 rounded-xl
+           border border-slate-300 hover:bg-slate-50 hover:border-slate-400
+           transition-all duration-200 active:scale-95
+           flex items-center justify-center gap-2;
+  }
+
+  .btn-ghost-light {
+    @apply text-slate-600 hover:text-slate-900 hover:bg-black/5
+           px-4 py-2 rounded-lg transition-all duration-200 font-medium
+           flex items-center justify-center gap-2;
+  }
+
+  .card-light {
+    @apply bg-white/80 border border-slate-200/90 rounded-2xl backdrop-blur-sm shadow-sm;
+  }
+
+  .pill-green {
+    @apply inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold
+           border border-green-600/30 bg-green-600/10 text-green-700;
+  }
+
+  .input-light {
+    @apply w-full bg-white border border-slate-300 rounded-xl px-4 py-3
+           text-slate-900 placeholder-slate-400
+           focus:outline-none focus:ring-2 focus:ring-green-500/40 focus:border-green-500/60
+           transition-all duration-200;
+  }
+
+  .gradient-text-green {
+    @apply bg-gradient-to-r from-green-700 to-emerald-500 bg-clip-text text-transparent;
+  }
+
   .label {
-    @apply block text-sm font-medium text-slate-300 mb-2;
+    @apply block text-sm font-medium text-slate-700 mb-2;
   }
 
   .badge {
@@ -120,67 +169,56 @@
   }
 
   .gradient-text {
-    @apply bg-gradient-to-r from-violet-400 to-cyan-400 bg-clip-text text-transparent;
+    @apply bg-gradient-to-r from-green-700 to-emerald-500 bg-clip-text text-transparent;
   }
 
   .gradient-text-pink {
-    @apply bg-gradient-to-r from-pink-400 to-violet-400 bg-clip-text text-transparent;
+    @apply bg-gradient-to-r from-emerald-600 to-teal-500 bg-clip-text text-transparent;
   }
 
   .nav-item {
-    @apply flex items-center gap-3 px-4 py-2.5 rounded-xl text-slate-400
-           hover:text-slate-100 hover:bg-slate-800/60 
+    @apply flex items-center gap-3 px-4 py-2.5 rounded-xl text-slate-600
+           hover:text-slate-900 hover:bg-black/5 
            transition-all duration-200 font-medium text-sm cursor-pointer
            border border-transparent;
   }
 
   .nav-item-active {
-    @apply nav-item text-violet-300 bg-violet-500/10 border-violet-500/25;
+    @apply nav-item text-green-700 bg-green-500/10 border-green-500/30;
   }
 
   .section-title {
-    @apply text-xl font-bold text-white;
+    @apply text-xl font-bold text-slate-900;
   }
 
   .section-subtitle {
-    @apply text-slate-400 text-sm mt-1;
+    @apply text-slate-600 text-sm mt-1;
   }
 
   .divider {
-    @apply border-t border-slate-800/80;
+    @apply border-t border-slate-200;
   }
 
-  .platform-preview-fb {
-    background: #242526;
-    border: 1px solid #3a3b3c;
-    border-radius: 12px;
-  }
-
-  .platform-preview-ig {
-    background: linear-gradient(180deg, #1a1a1a 0%, #000 100%);
-    border: 1px solid #262626;
-    border-radius: 12px;
-  }
-
+  /* Platform content previews — white card (see ContentPreview.jsx). */
+  .platform-preview-fb,
+  .platform-preview-ig,
   .platform-preview-tw {
-    background: #000;
-    border: 1px solid #2f3336;
-    border-radius: 16px;
+    @apply bg-white border border-slate-200 rounded-2xl;
   }
 
   .glass-card {
-    background: rgba(15, 23, 42, 0.6);
+    background: rgba(255, 255, 255, 0.7);
     backdrop-filter: blur(12px);
-    border: 1px solid rgba(148, 163, 184, 0.08);
+    border: 1px solid rgba(15, 23, 42, 0.08);
     border-radius: 16px;
   }
 
   .stat-number {
-    @apply text-3xl font-bold text-white;
+    @apply text-3xl font-bold text-slate-900;
   }
 
   .stat-label {
-    @apply text-slate-400 text-sm font-medium;
+    @apply text-slate-600 text-sm font-medium;
   }
 }
 
@@ -196,6 +234,25 @@
 
   .scrollbar-hide::-webkit-scrollbar {
     display: none;
+  }
+
+  /* Transparent shell so the premium body background shows through. */
+  .app-bg {
+    background-color: transparent;
+  }
+
+  /* Respect iOS/Android notches & home indicators. */
+  .safe-top { padding-top: env(safe-area-inset-top); }
+  .safe-bottom { padding-bottom: env(safe-area-inset-bottom); }
+  .safe-x {
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+  }
+
+  /* Comfortable tap target for mobile controls. */
+  .tap-target {
+    min-width: 44px;
+    min-height: 44px;
   }
 }
 
@@ -222,8 +279,8 @@
 .spinner {
   width: 22px;
   height: 22px;
-  border: 2.5px solid rgba(148, 163, 184, 0.2);
-  border-top-color: #7c3aed;
+  border: 2.5px solid rgba(15, 23, 42, 0.12);
+  border-top-color: #16a34a;
   border-radius: 50%;
   animation: spin 0.7s linear infinite;
 }
@@ -236,7 +293,7 @@
 .typing-cursor::after {
   content: '|';
   animation: blink 1s step-end infinite;
-  color: #7c3aed;
+  color: #16a34a;
 }
 
 @keyframes blink {
@@ -274,4 +331,89 @@
 @keyframes shimmer {
   0% { background-position: 200% 0; }
   100% { background-position: -200% 0; }
+}
+
+/* ─── Marketing / landing system ─────────────────────────────────────────── */
+
+/* Soft animated aurora blob used behind hero sections. */
+.aurora-blob {
+  position: absolute;
+  border-radius: 9999px;
+  filter: blur(80px);
+  opacity: 0.6;
+  pointer-events: none;
+  will-change: transform, opacity;
+}
+
+/* Faint grid that fades out toward the edges — adds depth without noise. */
+.bg-grid {
+  background-image:
+    linear-gradient(to right, rgba(148, 163, 184, 0.06) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(148, 163, 184, 0.06) 1px, transparent 1px);
+  background-size: 56px 56px;
+  -webkit-mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, #000 50%, transparent 100%);
+  mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, #000 50%, transparent 100%);
+}
+
+/* Animated gradient headline. */
+.shine-text {
+  background: linear-gradient(90deg, #a78bfa, #d946ef, #22d3ee, #a78bfa);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: shimmerText 4s linear infinite;
+}
+
+/* Green animated headline for the light theme. */
+.shine-green {
+  background: linear-gradient(90deg, #15803d, #22c55e, #0d9488, #15803d);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: shimmerText 4s linear infinite;
+}
+
+/* Glass surface for marketing cards. */
+.glass {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(14px);
+  border: 1px solid rgba(15, 23, 42, 0.08);
+}
+
+.pill {
+  @apply inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold
+         border border-green-500/30 bg-green-500/10 text-green-700;
+}
+
+/* Gradient ring outline used on premium cards. */
+.ring-gradient {
+  position: relative;
+}
+.ring-gradient::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(135deg, rgba(124,58,237,0.5), rgba(217,70,239,0.35), rgba(6,182,212,0.4));
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+/* Marquee track (logo / phrase scroller). */
+.marquee-track {
+  display: flex;
+  width: max-content;
+  animation: marquee 36s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .aurora-blob,
+  .marquee-track,
+  .shine-text,
+  .shine-green { animation: none !important; }
 }

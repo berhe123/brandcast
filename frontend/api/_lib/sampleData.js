@@ -1,47 +1,58 @@
+/**
+ * Demo data for VibePost
+ * -----------------------
+ * VibePost is brand-agnostic: real content is generated against whatever brand
+ * the user creates. The objects below are only used for the demo/sample feeds
+ * and as a neutral fallback brand context, so the product showcases well out of
+ * the box without being tied to any real company.
+ */
+
+// Neutral example brand used as a fallback context for the AI.
 const brandInfo = {
-  name: 'mySWOOOP',
-  description: 'Germany\'s leading certified refurbished electronics marketplace where people buy and sell used tech at fair prices',
-  voice: 'friendly, trustworthy, sustainable, and empowering',
-  values: ['sustainability', 'affordability', 'quality', 'transparency', 'circular economy'],
-  tagline: 'Gib weiter, was dich weit gebracht hat (Pass on what brought you far)',
-  website: 'https://www.myswooop.de',
+  name: 'Aura',
+  description: 'A modern lifestyle brand making everyday essentials people genuinely love',
+  voice: 'warm, confident, and effortlessly helpful',
+  values: ['quality', 'simplicity', 'sustainability', 'delight'],
+  tagline: 'Live a little brighter',
+  website: 'https://example.com',
   socials: {
-    facebook: 'https://de-de.facebook.com/myswooop/',
-    instagram: 'https://www.instagram.com/myswooop/',
-    twitter: 'https://twitter.com/myswooop',
-    linkedin: 'https://www.linkedin.com/company/myswooop',
-    tiktok: 'https://www.tiktok.com/@myswooop'
+    facebook: 'https://facebook.com',
+    instagram: 'https://instagram.com',
+    twitter: 'https://twitter.com',
+    linkedin: 'https://linkedin.com',
+    tiktok: 'https://tiktok.com'
   }
 };
 
+// Example posts shown in the "samples" feed — generic, on-trend marketing copy.
 const samplePosts = [
   {
     id: 'sp1',
     platform: 'facebook',
     tone: 'inspiring',
     contentType: 'post',
-    topic: 'Sell your old smartphone',
-    content: `📱 Still got an old smartphone gathering dust in a drawer? Don't let it go to waste!\n\nAt mySWOOOP, we turn your pre-loved tech into real money — fast, easy, and sustainable. In just 3 minutes, you'll get a fixed-price offer. We even cover the shipping costs.\n\nBecause every device deserves more than one chapter. ♻️\n\n👉 Find out how much your device is worth today!\n\n#mySWOOOP #SellYourPhone #Refurbished #Sustainability #CircularEconomy`,
+    topic: 'Launching our new collection',
+    content: `✨ Something new is here — and we think you're going to love it.\n\nWe spent months sweating the details so you don't have to. Thoughtful design, honest quality, and a price that feels right.\n\nBecause the everyday deserves a little magic. 💫\n\n👉 Be the first to explore the new collection.\n\n#NewArrivals #DesignedForYou #EverydayEssentials`,
     likes: 247,
     reach: 4200
   },
   {
     id: 'sp2',
     platform: 'instagram',
-    tone: 'trendy',
+    tone: 'exciting',
     contentType: 'post',
-    topic: 'Refurbished iPhone deals',
-    content: `✨ Why pay full price when you can go refurbished? 📱\n\nOur certified pre-loved iPhones are tested, polished, and ready for their next adventure — at a fraction of the cost.\n\n🔋 Battery checked\n📸 Camera tested\n✅ 36-month warranty included\n🔄 30-day returns, no questions asked\n\nSwoop in on the deal before it's gone 👇\n\n#mySWOOOP #RefurbishedTech #iPhone #SustainableTech #PreLoved #GoEco #TechDeals #AffordableTech #Refurbished #CircularEconomy #GreenTech #UsedPhones #BuyRefurbished #SaveMoney #TechLovers`,
+    topic: 'Behind the scenes of our latest drop',
+    content: `👀 POV: you get a sneak peek before anyone else.\n\nHere's what went into our latest drop — late nights, way too many prototypes, and a team that refused to settle.\n\nWorth it? Swipe and decide. 👉\n\n#BehindTheScenes #ComingSoon #MadeWithLove #NewDrop #StudioLife`,
     likes: 891,
     reach: 15600
   },
   {
     id: 'sp3',
     platform: 'twitter',
-    tone: 'casual',
+    tone: 'witty',
     contentType: 'post',
-    topic: 'Sustainability and tech',
-    content: `Your old gadgets have stories left to tell 🌍\n\nSell → Refurbish → Re-love\n\nJoin 1M+ people making tech circular with @mySWOOOP ♻️\n\n#GoEco #Refurbished`,
+    topic: 'Why simple beats complicated',
+    content: `Hot take: the best products get out of your way.\n\nNo manual. No friction. Just works.\n\nThat's the whole brief. ✅`,
     likes: 156,
     reach: 8900
   },
@@ -50,8 +61,8 @@ const samplePosts = [
     platform: 'facebook',
     tone: 'professional',
     contentType: 'promotion',
-    topic: 'New year device upgrade',
-    content: `🎉 New Year, New Device — Without Breaking the Bank!\n\nUpgrade your tech setup this year without the premium price tag. At mySWOOOP, our expertly refurbished laptops, smartphones, and tablets come with:\n\n✔️ Rigorous quality checks\n✔️ Up to 36 months warranty\n✔️ 30-day return guarantee\n✔️ Certified data deletion on all trade-ins\n\nOver 930,000 customers have already discovered the smarter way to shop for tech. Ready to join them?\n\n🔗 Shop now at myswooop.de\n\n#mySWOOOP #NewYear #RefurbishedTech #SaveMoney #SmartShopping`,
+    topic: 'Limited-time launch offer',
+    content: `🎉 Launch week is on — and so is our best offer of the season.\n\nFor a limited time, get our most-loved essentials with free shipping and a 30-day happiness guarantee.\n\n✔️ Designed to last\n✔️ Loved by thousands\n✔️ Risk-free to try\n\nReady to make the switch?\n\n🔗 Shop the launch today.\n\n#LaunchWeek #LimitedOffer #ShopNow`,
     likes: 432,
     reach: 7800
   },
@@ -60,18 +71,18 @@ const samplePosts = [
     platform: 'instagram',
     tone: 'inspiring',
     contentType: 'story',
-    topic: 'GoEco sustainability campaign',
-    content: `🌱 Every device you sell to mySWOOOP is one less device in a landfill.\n\nWe believe in a world where electronics live longer, waste less, and cost less.\n\nThat's the mySWOOOP promise 💚\n\nSwipe to see how it works ➡️\n\n#GoEco #mySWOOOP #Nachhaltigkeit #Sustainability #RefurbishedTech #CircularEconomy #EcoFriendly #GreenTech #PreLovedTech #SaveThePlanet #TechForGood #Refurbished #SecondLife`,
+    topic: 'Our sustainability promise',
+    content: `🌱 Small choices, made often, change everything.\n\nThat's why every product we make is built to last longer, waste less, and feel better to own.\n\nProgress over perfection — one step at a time. 💚\n\nSwipe to see how we're doing it ➡️\n\n#Sustainability #MadeToLast #ConsciousLiving #BrandWithPurpose`,
     likes: 1204,
     reach: 22400
   },
   {
     id: 'sp6',
     platform: 'twitter',
-    tone: 'witty',
+    tone: 'friendly',
     contentType: 'post',
-    topic: 'Trade-in your old laptop',
-    content: `Laptop gathering dust? 💻\n\nSell it to us in 3 minutes. We ship it free. You get paid. Everyone wins.\n\nEasy as that 👉 myswooop.de #mySWOOOP #SellYourLaptop`,
+    topic: 'A quick thank you to our community',
+    content: `10,000 of you. 🤯\n\nThank you for every order, every review, and every DM.\n\nWe're just getting started — and you're the reason why. 💛`,
     likes: 89,
     reach: 5400
   },
@@ -80,8 +91,8 @@ const samplePosts = [
     platform: 'linkedin',
     tone: 'professional',
     contentType: 'post',
-    topic: 'Circular economy in consumer electronics',
-    content: `The circular economy isn't just a trend — it's the future of consumer electronics.\n\nAt mySWOOOP, we've helped over 1 million customers buy and sell certified refurbished devices. Every transaction keeps one more device out of a landfill, saves money for buyers, and generates income for sellers.\n\nOur process is built on trust:\n✔ Rigorous quality checks\n✔ Up to 36 months warranty\n✔ Certified data deletion\n✔ 30-day return guarantee\n\nSustainability and affordability aren't opposites. They're the same choice.\n\nExplore how it works at myswooop.de\n\n#mySWOOOP #CircularEconomy #RefurbishedTech #Sustainability`,
+    topic: 'What building in public taught us',
+    content: `Building in public taught us one thing above all: customers don't want perfect — they want honest.\n\nThis year we shipped faster, listened harder, and turned feedback into our roadmap.\n\nThree lessons that stuck:\n→ Talk to customers before you build, not after\n→ Ship small, ship often, learn always\n→ Culture isn't a poster — it's what you reward\n\nGrateful for a team and community that makes the work meaningful.\n\n#BuildInPublic #StartupLessons #ProductStrategy`,
     likes: 312,
     reach: 9800
   },
@@ -90,77 +101,78 @@ const samplePosts = [
     platform: 'tiktok',
     tone: 'exciting',
     contentType: 'post',
-    topic: 'Score premium tech at half the price',
-    content: `POV: You just discovered you can get a certified iPhone for half the price 📱✨\n\nmySWOOOP = tested + guaranteed + eco-friendly\n\nLink in bio 👇 myswooop.de\n\n#mySWOOOP #Refurbished #TechTok #FYP #iPhone`,
+    topic: 'The upgrade you did not know you needed',
+    content: `POV: you finally upgraded the one thing you use every single day ✨\n\nLittle change. Big difference. 🙌\n\nLink in bio 👇\n\n#TikTokMadeMeBuyIt #Upgrade #DailyEssentials #FYP`,
     likes: 2104,
     reach: 48200
   }
 ];
 
+// Reusable, brand-agnostic templates — prefill the generator for any brand.
 const contentTemplates = [
   {
     id: 'tpl1',
     platform: 'all',
     category: 'Product Promotion',
     name: 'New Arrival Highlight',
-    description: 'Showcase a freshly refurbished product',
-    fields: { topic: 'New refurbished [PRODUCT] available at mySWOOOP', tone: 'exciting', contentType: 'post' }
+    description: 'Announce a new product and the one reason people will love it',
+    fields: { topic: 'Introducing our newest product and why it stands out', tone: 'exciting', contentType: 'post' }
   },
   {
     id: 'tpl2',
     platform: 'instagram',
-    category: 'Sustainability',
-    name: 'GoEco Campaign',
-    description: 'Environmental impact and circular economy message',
-    fields: { topic: 'Buying refurbished tech reduces e-waste and saves the planet', tone: 'inspiring', contentType: 'post' }
+    category: 'Brand Story',
+    name: 'Behind the Scenes',
+    description: 'Pull back the curtain on how something gets made',
+    fields: { topic: 'A behind-the-scenes look at how we built our latest product', tone: 'friendly', contentType: 'story' }
   },
   {
     id: 'tpl3',
     platform: 'facebook',
     category: 'Customer Story',
-    name: 'Sell Your Device CTA',
-    description: 'Encourage users to sell unused electronics',
-    fields: { topic: 'Turn your unused gadgets into money with mySWOOOP', tone: 'friendly', contentType: 'post' }
+    name: 'Customer Spotlight',
+    description: 'Turn a happy customer into social proof',
+    fields: { topic: 'A customer success story that shows the real impact of our product', tone: 'warm', contentType: 'post' }
   },
   {
     id: 'tpl4',
     platform: 'twitter',
     category: 'Quick Tip',
-    name: 'Tech Tip Tweet',
-    description: 'Short helpful tech or sustainability tip',
-    fields: { topic: 'Quick tip about saving money by buying refurbished tech', tone: 'casual', contentType: 'post' }
+    name: 'Value Tip',
+    description: 'Share a short, genuinely useful tip your audience will save',
+    fields: { topic: 'A quick, practical tip our audience can use today', tone: 'casual', contentType: 'post' }
   },
   {
     id: 'tpl5',
     platform: 'all',
     category: 'Sale & Deals',
-    name: 'Special Offer',
-    description: 'Promote a limited-time deal or discount',
-    fields: { topic: 'Limited time offer on refurbished smartphones at mySWOOOP', tone: 'urgent', contentType: 'promotion' }
+    name: 'Limited-Time Offer',
+    description: 'Drive urgency around a deal or launch window',
+    fields: { topic: 'A limited-time offer customers should not miss', tone: 'urgent', contentType: 'promotion' }
   },
   {
     id: 'tpl6',
     platform: 'instagram',
     category: 'Brand Awareness',
-    name: 'Brand Story',
-    description: 'Tell the mySWOOOP brand mission and values',
-    fields: { topic: 'mySWOOOP mission: giving devices their next life', tone: 'inspiring', contentType: 'story' }
+    name: 'Mission & Values',
+    description: 'Say what you stand for in a way people remember',
+    fields: { topic: 'Our mission and the values behind everything we make', tone: 'inspiring', contentType: 'story' }
   },
   {
     id: 'tpl7',
-    platform: 'facebook',
-    category: 'Education',
-    name: 'What is Refurbished?',
-    description: 'Educate audience about refurbished tech',
-    fields: { topic: 'What does certified refurbished actually mean and why it is safe to buy', tone: 'educational', contentType: 'post' }
+    platform: 'linkedin',
+    category: 'Thought Leadership',
+    name: 'Lesson Learned',
+    description: 'Share an insight that positions you as an expert',
+    fields: { topic: 'A lesson we learned this year and what it means for our customers', tone: 'professional', contentType: 'post' }
   },
   {
     id: 'tpl8',
     platform: 'all',
     category: 'Seasonal',
-    name: 'Holiday Campaign',
-    description: 'Seasonal or holiday-themed post',
-    fields: { topic: 'Gift a refurbished device this holiday season - great quality, lower price', tone: 'warm', contentType: 'post' }
+    name: 'Seasonal Campaign',
+    description: 'Tie your product to a season, holiday, or moment',
+    fields: { topic: 'A seasonal campaign that connects our product to this time of year', tone: 'warm', contentType: 'post' }
   }
 ];
 

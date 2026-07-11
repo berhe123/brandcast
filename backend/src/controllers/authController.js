@@ -13,7 +13,7 @@ const emailStart = async (req, res, next) => {
         devCode: result.devCode, // present only in demo mode
         message: result.delivered
           ? `We sent a 6-digit code to ${result.email}.`
-          : `Demo mode: use the code shown below (no email service configured).`,
+          : `Email delivery isn't configured. Add a Resend or SendGrid API key to receive codes.`,
       },
     });
   } catch (err) { next(err); }

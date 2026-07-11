@@ -7,7 +7,7 @@ export default function RequireAuth({ children }) {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-slate-950 flex items-center justify-center">
+      <div className="min-h-screen bg-[#dae1e3] flex items-center justify-center">
         <div className="spinner" />
       </div>
     )

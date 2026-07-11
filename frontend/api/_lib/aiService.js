@@ -45,16 +45,15 @@ const generateWithClaude = async (params) => {
   const config = platformConfig[platform.toLowerCase()] || platformConfig.facebook;
   const platformName = platform.charAt(0).toUpperCase() + platform.slice(1);
 
-  const prompt = `You are an expert social media content creator for mySWOOOP, a leading German refurbished electronics marketplace.
+  const b = brandInfo || {};
+  const prompt = `You are an expert social media copywriter creating on-brand content for the brand below.
 
 BRAND CONTEXT:
-- Company: ${brandInfo.name}
-- Description: ${brandInfo.description}
-- Voice: ${brandInfo.voice}
-- Values: ${brandInfo.values.join(', ')}
-- Tagline: "${brandInfo.tagline}"
-- Products: Smartphones, Tablets, Laptops, MacBooks, Smartwatches, Cameras, Consoles
-- Key Benefits: Up to 36 months warranty, 30-day returns, 97% customer satisfaction, 1M+ happy customers, 454 locations in Germany
+- Brand: ${b.name || 'the brand'}
+- Description: ${b.description || ''}
+- Voice: ${b.voice || 'clear, helpful, and authentic'}
+- Values: ${(b.values || []).join(', ')}
+- Tagline: "${b.tagline || ''}"
 
 TASK: Create a ${contentType} for ${platformName} about: "${topic}"
 
@@ -76,7 +75,7 @@ RULES:
 1. Output ONLY the ready-to-post content - no labels, explanations, or metadata
 2. Strictly respect the character limit for ${platformName}
 3. Make it authentic and engaging for the target audience
-4. Align content with mySWOOOP sustainable mission
+4. Stay true to the brand's voice and values
 5. ${language === 'german' ? 'Write ENTIRELY in German (Deutsch)' : 'Write in English'}
 
 Generate the post content now:`;

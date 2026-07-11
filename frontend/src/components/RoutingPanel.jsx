@@ -4,10 +4,10 @@ import { Cpu, GitMerge, Sparkles, ChevronDown, Zap, FlaskConical } from 'lucide-
 
 // Brand-ish colours per provider so each model badge is instantly recognisable.
 const PROVIDER_STYLE = {
-  anthropic: { dot: 'bg-orange-400', text: 'text-orange-300', ring: 'border-orange-500/30 bg-orange-500/10' },
-  openai: { dot: 'bg-emerald-400', text: 'text-emerald-300', ring: 'border-emerald-500/30 bg-emerald-500/10' },
-  gemini: { dot: 'bg-blue-400', text: 'text-blue-300', ring: 'border-blue-500/30 bg-blue-500/10' },
-  deepseek: { dot: 'bg-indigo-400', text: 'text-indigo-300', ring: 'border-indigo-500/30 bg-indigo-500/10' },
+  anthropic: { dot: 'bg-orange-500', text: 'text-orange-700', ring: 'border-orange-500/30 bg-orange-500/10' },
+  openai: { dot: 'bg-emerald-500', text: 'text-emerald-700', ring: 'border-emerald-500/30 bg-emerald-500/10' },
+  gemini: { dot: 'bg-blue-500', text: 'text-blue-700', ring: 'border-blue-500/30 bg-blue-500/10' },
+  deepseek: { dot: 'bg-indigo-500', text: 'text-indigo-700', ring: 'border-indigo-500/30 bg-indigo-500/10' },
 }
 
 function ModelChip({ model, role }) {
@@ -37,11 +37,11 @@ export default function RoutingPanel({ routing, drafts }) {
     <motion.div
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
-      className="card p-4 border-violet-500/20 bg-gradient-to-br from-violet-500/[0.06] to-transparent"
+      className="card p-4 border-green-500/25 bg-gradient-to-br from-green-500/[0.08] to-transparent"
     >
       {/* Header */}
       <div className="flex items-center gap-2 flex-wrap">
-        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-violet-500/15 border border-violet-500/30 text-violet-200 text-xs font-bold">
+        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-green-500/15 border border-green-500/30 text-green-700 text-xs font-bold">
           {isHybrid ? <GitMerge size={12} /> : <Cpu size={12} />}
           {isHybrid ? 'Hybrid Fusion' : 'Smart Route'}
         </span>
@@ -49,9 +49,9 @@ export default function RoutingPanel({ routing, drafts }) {
         {isHybrid ? (
           <div className="flex items-center gap-1.5 flex-wrap">
             <ModelChip model={routing.primary} role="lead" />
-            <Sparkles size={12} className="text-slate-500" />
+            <Sparkles size={12} className="text-slate-400" />
             <ModelChip model={routing.partner} role="boost" />
-            <GitMerge size={12} className="text-violet-400" />
+            <GitMerge size={12} className="text-green-600" />
             <ModelChip model={routing.synthesizer} role="merge" />
           </div>
         ) : (
@@ -67,14 +67,14 @@ export default function RoutingPanel({ routing, drafts }) {
       </div>
 
       {/* Rationale */}
-      <p className="text-sm text-slate-300 mt-3 leading-relaxed">{routing.rationale}</p>
+      <p className="text-sm text-slate-700 mt-3 leading-relaxed">{routing.rationale}</p>
 
       {/* Task skill tags */}
       {routing.topSkills?.length > 0 && (
         <div className="flex items-center gap-1.5 mt-3 flex-wrap">
           <span className="text-[11px] text-slate-500">Optimised for:</span>
           {routing.topSkills.map((s) => (
-            <span key={s} className="text-[11px] px-2 py-0.5 rounded-md bg-slate-800/70 border border-slate-700/60 text-slate-400">
+            <span key={s} className="text-[11px] px-2 py-0.5 rounded-md bg-slate-100 border border-slate-200 text-slate-600">
               {s}
             </span>
           ))}
@@ -86,7 +86,7 @@ export default function RoutingPanel({ routing, drafts }) {
         <>
           <button
             onClick={() => setOpen((v) => !v)}
-            className="flex items-center gap-2 text-xs text-violet-300/80 hover:text-violet-200 mt-3 transition-colors"
+            className="flex items-center gap-2 text-xs text-green-700/90 hover:text-green-600 mt-3 transition-colors"
           >
             <FlaskConical size={13} />
             {open ? 'Hide' : 'Show'} the two drafts we fused
@@ -102,14 +102,14 @@ export default function RoutingPanel({ routing, drafts }) {
               >
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-3">
                   {drafts.map((d, i) => (
-                    <div key={i} className="rounded-xl border border-slate-700/60 bg-slate-900/50 p-3">
+                    <div key={i} className="rounded-xl border border-slate-200 bg-slate-50 p-3">
                       <div className="mb-2"><ModelChip model={d.model} role={d.role} /></div>
-                      <p className="text-xs text-slate-400 whitespace-pre-wrap leading-relaxed line-clamp-[12]">{d.text}</p>
+                      <p className="text-xs text-slate-600 whitespace-pre-wrap leading-relaxed line-clamp-[12]">{d.text}</p>
                     </div>
                   ))}
                 </div>
                 <p className="text-[11px] text-slate-500 mt-2 flex items-center gap-1.5">
-                  <GitMerge size={11} className="text-violet-400" />
+                  <GitMerge size={11} className="text-green-600" />
                   {routing.synthesizer.label} merged the best of both into the final post above.
                 </p>
               </motion.div>

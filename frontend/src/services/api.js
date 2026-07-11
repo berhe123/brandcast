@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-const TOKEN_KEY = 'amb-token'
+const TOKEN_KEY = 'vibepost-token'
 
 export const getToken = () => localStorage.getItem(TOKEN_KEY)
 export const setToken = (t) => (t ? localStorage.setItem(TOKEN_KEY, t) : localStorage.removeItem(TOKEN_KEY))
@@ -24,7 +24,7 @@ api.interceptors.response.use(
     // A 401 means our session is gone — drop the token so guards can redirect.
     if (err.response?.status === 401) {
       setToken(null)
-      window.dispatchEvent(new Event('amb-unauthorized'))
+      window.dispatchEvent(new Event('vibepost-unauthorized'))
     }
     const message = err.response?.data?.error || err.message || 'Something went wrong'
     return Promise.reject(new Error(message))

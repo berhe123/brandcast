@@ -9,12 +9,12 @@ import toast from 'react-hot-toast'
 import { getScheduled, publishScheduled, deleteScheduled } from '../services/api'
 
 const PLATFORM = {
-  facebook: { icon: Facebook, color: 'text-blue-400', bg: 'bg-blue-500/10' },
-  instagram: { icon: Instagram, color: 'text-pink-400', bg: 'bg-pink-500/10' },
-  twitter: { icon: Twitter, color: 'text-sky-400', bg: 'bg-sky-500/10' },
-  linkedin: { icon: Linkedin, color: 'text-indigo-400', bg: 'bg-indigo-500/10' },
-  tiktok: { icon: TikTokIcon, color: 'text-teal-400', bg: 'bg-teal-500/10' },
-  blog: { icon: BookOpen, color: 'text-orange-400', bg: 'bg-orange-500/10' },
+  facebook: { icon: Facebook, color: 'text-blue-600', bg: 'bg-blue-500/10' },
+  instagram: { icon: Instagram, color: 'text-pink-600', bg: 'bg-pink-500/10' },
+  twitter: { icon: Twitter, color: 'text-sky-600', bg: 'bg-sky-500/10' },
+  linkedin: { icon: Linkedin, color: 'text-indigo-600', bg: 'bg-indigo-500/10' },
+  tiktok: { icon: TikTokIcon, color: 'text-teal-600', bg: 'bg-teal-500/10' },
+  blog: { icon: BookOpen, color: 'text-orange-600', bg: 'bg-orange-500/10' },
 }
 
 const fmt = (iso) => new Date(iso).toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' })
@@ -27,7 +27,7 @@ const TABS = [
 
 function Metric({ icon: Icon, value }) {
   return (
-    <span className="inline-flex items-center gap-1 text-xs text-slate-400">
+    <span className="inline-flex items-center gap-1 text-xs text-slate-600">
       <Icon size={13} /> {value?.toLocaleString() ?? 0}
     </span>
   )
@@ -89,8 +89,8 @@ export default function Schedule() {
             onClick={() => setTab(value)}
             className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium border transition-all
               ${tab === value
-                ? 'bg-violet-500/15 border-violet-500/40 text-violet-300'
-                : 'bg-slate-800/40 border-slate-700/60 text-slate-400 hover:border-slate-600'}`}
+                ? 'bg-green-500/15 border-green-500/40 text-green-700'
+                : 'bg-slate-50 border-slate-200 text-slate-500 hover:border-slate-300'}`}
           >
             <Icon size={15} /> {label}
           </button>
@@ -101,10 +101,10 @@ export default function Schedule() {
         <div className="flex justify-center py-20"><div className="spinner" /></div>
       ) : items.length === 0 ? (
         <div className="card p-12 text-center">
-          <CalendarClock size={40} className="mx-auto text-slate-600 mb-3" />
-          <p className="text-slate-300 font-medium">Nothing here yet</p>
+          <CalendarClock size={40} className="mx-auto text-slate-400 mb-3" />
+          <p className="text-slate-700 font-medium">Nothing here yet</p>
           <p className="text-slate-500 text-sm mt-1">
-            Generate content, then hit <span className="text-violet-300">Schedule</span> to queue posts across your channels.
+            Generate content, then hit <span className="text-green-700">Schedule</span> to queue posts across your channels.
           </p>
         </div>
       ) : (
@@ -120,15 +120,15 @@ export default function Schedule() {
                     <Icon size={16} className={meta.color} />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-white capitalize">{post.platform}</p>
+                    <p className="text-sm font-medium text-slate-900 capitalize">{post.platform}</p>
                     <p className="text-xs text-slate-500 truncate">{post.topic || post.brandName || 'Post'}</p>
                   </div>
-                  <span className={`badge text-[11px] ${published ? 'bg-green-500/15 text-green-300 border-green-500/30' : post.status === 'cancelled' ? 'bg-slate-700/40 text-slate-400 border-slate-600' : 'bg-amber-500/15 text-amber-300 border-amber-500/30'}`}>
+                  <span className={`badge text-[11px] ${published ? 'bg-green-500/15 text-green-700 border-green-500/30' : post.status === 'cancelled' ? 'bg-slate-100 text-slate-500 border-slate-200' : 'bg-amber-500/15 text-amber-700 border-amber-500/30'}`}>
                     {published ? 'Published' : post.status === 'cancelled' ? 'Cancelled' : 'Scheduled'}
                   </span>
                 </div>
 
-                <p className="text-sm text-slate-300 whitespace-pre-wrap line-clamp-4 flex-1">{post.content}</p>
+                <p className="text-sm text-slate-700 whitespace-pre-wrap line-clamp-4 flex-1">{post.content}</p>
 
                 <div className="flex items-center gap-1.5 mt-3 text-xs text-slate-500">
                   <CalendarClock size={13} />
@@ -136,7 +136,7 @@ export default function Schedule() {
                 </div>
 
                 {published && post.metrics && (
-                  <div className="flex items-center gap-4 mt-3 pt-3 border-t border-slate-800">
+                  <div className="flex items-center gap-4 mt-3 pt-3 border-t border-slate-200">
                     <Metric icon={Eye} value={post.metrics.impressions} />
                     <Metric icon={Heart} value={post.metrics.likes} />
                     <Metric icon={MessageCircle} value={post.metrics.comments} />
@@ -145,7 +145,7 @@ export default function Schedule() {
                 )}
 
                 {!published && post.status !== 'cancelled' && (
-                  <div className="flex items-center gap-2 mt-3 pt-3 border-t border-slate-800">
+                  <div className="flex items-center gap-2 mt-3 pt-3 border-t border-slate-200">
                     <button
                       onClick={() => handlePublish(post.id)}
                       disabled={busyId === post.id}
@@ -156,7 +156,7 @@ export default function Schedule() {
                     <button
                       onClick={() => handleDelete(post.id)}
                       disabled={busyId === post.id}
-                      className="btn-ghost py-1.5 px-3 text-xs text-red-400"
+                      className="btn-ghost py-1.5 px-3 text-xs text-red-600"
                     >
                       <Trash2 size={13} />
                     </button>

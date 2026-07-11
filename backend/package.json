@@ -1,11 +1,12 @@
 {
-  "name": "myswooop-marketing-backend",
+  "name": "vibepost-backend",
   "version": "1.0.0",
-  "description": "AI Digital Marketing API for mySWOOOP",
+  "description": "VibePost — multi-model AI social media content API",
   "main": "src/server.js",
   "scripts": {
     "start": "node src/server.js",
-    "dev": "nodemon src/server.js"
+    "dev": "nodemon src/server.js",
+    "test": "node --test"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.30.0",

@@ -1,7 +1,6 @@
 import React, { useState } from 'react'
 import { NavLink, useLocation, useNavigate } from 'react-router-dom'
 import {
-  Zap,
   ChevronRight,
   Plus,
   MoreVertical,
@@ -12,8 +11,9 @@ import {
   BarChart3,
   LayoutTemplate,
   Users,
+  X,
 } from 'lucide-react'
-import { TikTokIcon } from './PlatformIcons'
+import Logo from './Logo'
 import { useApp } from '../context/AppContext'
 import { useAuth } from '../context/AuthContext'
 
@@ -24,7 +24,7 @@ const navLinks = [
   { to: '/app/templates', label: 'Templates', icon: LayoutTemplate },
 ]
 
-export default function Sidebar() {
+export default function Sidebar({ onNavigate }) {
   const location = useLocation()
   const navigate = useNavigate()
   const { stats, brands, selectBrand, selectedBrand, removeBrand } = useApp()
@@ -32,23 +32,24 @@ export default function Sidebar() {
   const [openMenuId, setOpenMenuId] = useState(null)
 
   return (
-    <aside className="w-64 flex-shrink-0 bg-slate-950/90 border-r border-slate-800/60 flex flex-col h-full">
+    <aside className="w-[17rem] max-w-[85vw] flex-shrink-0 bg-white/70 backdrop-blur-md border-r border-slate-200 flex flex-col h-full safe-top safe-bottom">
       {/* Logo */}
-      <div className="px-6 py-5 border-b border-slate-800/60">
-        <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-violet-600 to-cyan-500 flex items-center justify-center shadow-glow-purple">
-            <Zap size={16} className="text-white" />
-          </div>
-          <div>
-            <p className="font-bold text-white text-sm leading-tight">AI Media Buncher</p>
-            <p className="text-slate-500 text-xs">Content Creator Dashboard</p>
-          </div>
-        </div>
+      <div className="px-6 py-5 border-b border-slate-200 flex items-center justify-between">
+        <Logo size={34} />
+        {onNavigate && (
+          <button
+            onClick={onNavigate}
+            className="lg:hidden tap-target -mr-2 inline-flex items-center justify-center rounded-lg text-slate-500 hover:text-slate-900 hover:bg-black/5 transition-colors"
+            aria-label="Close menu"
+          >
+            <X size={20} />
+          </button>
+        )}
       </div>
 
       {/* Navigation */}
       <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
-        <p className="px-3 text-xs font-semibold text-slate-600 uppercase tracking-wider mb-3">Menu</p>
+        <p className="px-3 text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3">Menu</p>
 
         {navLinks.map(({ to, label, icon: Icon }) => (
           <NavLink
@@ -95,11 +96,12 @@ export default function Sidebar() {
                     onClick={() => {
                       selectBrand(brand.id)
                       navigate(`/app/brand/${brand.id}/content`)
+                      onNavigate?.()
                     }}
                     className={`w-full text-left px-3 py-2 rounded-2xl transition-all text-sm font-medium flex items-center justify-between ${
                       selectedBrand?.id === brand.id
-                        ? 'bg-violet-500/15 border border-violet-500/40 text-white'
-                        : 'bg-slate-950 border border-slate-800 text-slate-300 hover:border-slate-700 hover:text-white'
+                        ? 'bg-green-500/15 border border-green-500/40 text-green-800'
+                        : 'bg-white border border-slate-200 text-slate-700 hover:border-slate-300 hover:text-slate-900'
                     }`}
                   >
                     <span className="truncate">{brand.name}</span>
@@ -108,21 +110,21 @@ export default function Sidebar() {
                         e.stopPropagation()
                         setOpenMenuId(openMenuId === brand.id ? null : brand.id)
                       }}
-                      className="flex-shrink-0 p-1 hover:bg-slate-700/50 rounded transition-all"
+                      className="flex-shrink-0 p-1 hover:bg-slate-200/70 rounded transition-all"
                     >
-                      <MoreVertical size={16} className="text-slate-400 hover:text-slate-200" />
+                      <MoreVertical size={16} className="text-slate-400 hover:text-slate-700" />
                     </button>
                   </button>
 
                   {/* Dropdown Menu */}
                   {openMenuId === brand.id && (
-                    <div className="absolute right-0 top-full mt-1 w-40 bg-slate-900 border border-slate-700 rounded-lg shadow-lg z-50">
+                    <div className="absolute right-0 top-full mt-1 w-40 bg-white border border-slate-200 rounded-lg shadow-lg z-50">
                       <button
                         onClick={() => {
                           setOpenMenuId(null)
                           navigate(`/app/brand/${brand.id}/edit`)
                         }}
-                        className="w-full text-left px-4 py-2 hover:bg-slate-800 transition-all text-sm text-slate-300 hover:text-white flex items-center gap-2 first:rounded-t-lg"
+                        className="w-full text-left px-4 py-2 hover:bg-slate-50 transition-all text-sm text-slate-700 hover:text-slate-900 flex items-center gap-2 first:rounded-t-lg"
                       >
                         <Edit2 size={14} />
                         Edit
@@ -132,7 +134,7 @@ export default function Sidebar() {
                           setOpenMenuId(null)
                           removeBrand(brand.id)
                         }}
-                        className="w-full text-left px-4 py-2 hover:bg-red-950/50 transition-all text-sm text-red-400 hover:text-red-300 flex items-center gap-2 last:rounded-b-lg"
+                        className="w-full text-left px-4 py-2 hover:bg-red-50 transition-all text-sm text-red-600 hover:text-red-700 flex items-center gap-2 last:rounded-b-lg"
                       >
                         <Trash2 size={14} />
                         Delete
@@ -147,21 +149,21 @@ export default function Sidebar() {
       </nav>
 
       {/* Stats mini */}
-      <div className="px-4 py-4 border-t border-slate-800/60">
+      <div className="px-4 py-4 border-t border-slate-200">
         <div className="card p-4">
           <p className="text-xs text-slate-500 font-medium mb-3 uppercase tracking-wide">Session Stats</p>
           <div className="grid grid-cols-3 gap-2">
             {[
-              { label: 'Total', value: stats.totalGenerated, color: 'text-violet-400' },
-              { label: 'FB', value: stats.byPlatform.facebook || 0, color: 'text-blue-400' },
-              { label: 'IG', value: stats.byPlatform.instagram || 0, color: 'text-pink-400' },
-              { label: 'TW', value: stats.byPlatform.twitter || 0, color: 'text-sky-400' },
-              { label: 'LI', value: stats.byPlatform.linkedin || 0, color: 'text-indigo-400' },
-              { label: 'TT', value: stats.byPlatform.tiktok || 0, color: 'text-teal-400' },
+              { label: 'Total', value: stats.totalGenerated, color: 'text-green-600' },
+              { label: 'FB', value: stats.byPlatform.facebook || 0, color: 'text-blue-600' },
+              { label: 'IG', value: stats.byPlatform.instagram || 0, color: 'text-pink-600' },
+              { label: 'TW', value: stats.byPlatform.twitter || 0, color: 'text-sky-600' },
+              { label: 'LI', value: stats.byPlatform.linkedin || 0, color: 'text-indigo-600' },
+              { label: 'TT', value: stats.byPlatform.tiktok || 0, color: 'text-teal-600' },
             ].map(({ label, value, color }) => (
               <div key={label} className="text-center">
                 <p className={`text-base font-bold ${color}`}>{value}</p>
-                <p className="text-slate-600 text-xs">{label}</p>
+                <p className="text-slate-500 text-xs">{label}</p>
               </div>
             ))}
           </div>

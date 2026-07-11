@@ -23,15 +23,69 @@ const CODE_TTL_MS = 10 * 60 * 1000;
 const normEmail = (e) => String(e || '').trim().toLowerCase();
 const emailValid = (e) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e);
 const hasEmailProvider = () => Boolean(process.env.RESEND_API_KEY || process.env.SENDGRID_API_KEY);
+const FROM = process.env.EMAIL_FROM || 'VibePost <onboarding@resend.dev>';
 
-/** Replace with a real provider call. Returns true if actually delivered. */
+/** Branded HTML for the one-time code email. */
+const codeEmailHtml = (code) => `
+  <div style="font-family:Inter,Arial,sans-serif;background:#06060f;padding:40px 0;">
+    <div style="max-width:440px;margin:0 auto;background:#0a0a16;border:1px solid rgba(255,255,255,.08);border-radius:20px;padding:36px;">
+      <div style="font-size:20px;font-weight:700;color:#fff;letter-spacing:-.3px;margin-bottom:8px;">VibePost</div>
+      <p style="color:#cbd5e1;font-size:15px;line-height:1.6;margin:0 0 20px;">Use this code to sign in. It expires in 10 minutes.</p>
+      <div style="font-size:34px;font-weight:700;letter-spacing:.4em;color:#fff;text-align:center;background:linear-gradient(135deg,#7c3aed,#06b6d4);-webkit-background-clip:text;background-clip:text;padding:18px 0;">${code}</div>
+      <p style="color:#64748b;font-size:13px;line-height:1.6;margin:20px 0 0;">If you didn't request this, you can safely ignore this email.</p>
+    </div>
+  </div>`;
+
+/** Send a transactional email via Resend or SendGrid. Returns true if accepted. */
+const sendEmail = async ({ to, subject, html, text }) => {
+  try {
+    if (process.env.RESEND_API_KEY) {
+      const res = await fetch('https://api.resend.com/emails', {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${process.env.RESEND_API_KEY}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ from: FROM, to: [to], subject, html }),
+      });
+      if (!res.ok) throw new Error(`Resend responded ${res.status}: ${await res.text()}`);
+      return true;
+    }
+    if (process.env.SENDGRID_API_KEY) {
+      const res = await fetch('https://api.sendgrid.com/v3/mail/send', {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${process.env.SENDGRID_API_KEY}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          personalizations: [{ to: [{ email: to }] }],
+          from: { email: FROM.replace(/.*<(.+)>.*/, '$1') },
+          subject,
+          content: [{ type: 'text/html', value: html }, { type: 'text/plain', value: text }],
+        }),
+      });
+      if (!res.ok) throw new Error(`SendGrid responded ${res.status}: ${await res.text()}`);
+      return true;
+    }
+  } catch (err) {
+    console.error('[auth] email delivery failed:', err.message);
+  }
+  return false;
+};
+
+/** Deliver the 6-digit code. Real send when a provider key is set; demo otherwise. */
 const deliverCode = async (email, code) => {
   if (!hasEmailProvider()) {
     console.log(`\n[auth] DEMO login code for ${email}: ${code}\n`);
     return false; // not really sent — caller will surface the demo code
   }
-  // TODO: integrate Resend/SendGrid here when keys are present.
-  return true;
+  return sendEmail({
+    to: email,
+    subject: `${code} is your VibePost sign-in code`,
+    html: codeEmailHtml(code),
+    text: `Your VibePost sign-in code is ${code}. It expires in 10 minutes.`,
+  });
 };
 
 const findOrCreateUser = ({ email, name, avatar, provider }) => {

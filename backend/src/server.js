@@ -23,7 +23,7 @@ const limiter = rateLimit({
 const allowedOrigins = [
   'http://localhost:5173',
   'http://localhost:3000',
-  'https://myswooop-marketing.vercel.app',
+  'https://vibepost.vercel.app',
 ];
 if (process.env.FRONTEND_URL) allowedOrigins.push(process.env.FRONTEND_URL);
 
@@ -52,7 +52,7 @@ app.use('/api/analytics', analyticsRoutes);
 app.get('/api/health', (req, res) => {
   res.json({
     status: 'OK',
-    message: 'mySWOOOP Marketing API is running',
+    message: 'VibePost API is running',
     timestamp: new Date().toISOString()
   });
 });
@@ -61,7 +61,7 @@ app.use(errorHandler);
 
 app.listen(PORT, () => {
   startScheduler(); // background publish loop for scheduled posts
-  console.log(`\n🚀 mySWOOOP Marketing API`);
+  console.log(`\n🚀 VibePost API`);
   console.log(`   Server: http://localhost:${PORT}`);
   console.log(`   Environment: ${process.env.NODE_ENV || 'development'}`);
   console.log(`   Scheduler: ✅ running`);

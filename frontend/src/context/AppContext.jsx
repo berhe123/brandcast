@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useCallback, useEffect, useMemo } from 'react'
 
 const AppContext = createContext(null)
-const STORAGE_KEY = 'ai-media-buncher-state'
+const STORAGE_KEY = 'vibepost-state'
 
 const initialStats = {
   totalGenerated: 0,

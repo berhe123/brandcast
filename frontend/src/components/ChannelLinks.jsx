@@ -4,13 +4,13 @@ import { TikTokIcon } from './PlatformIcons'
 
 // Per-channel icon + accent used wherever a brand's links are shown.
 export const CHANNEL_META = {
-  website: { label: 'Website', Icon: Globe, color: 'text-violet-300', bg: 'bg-violet-500/10' },
-  facebook: { label: 'Facebook', Icon: Facebook, color: 'text-blue-400', bg: 'bg-blue-500/10' },
-  instagram: { label: 'Instagram', Icon: Instagram, color: 'text-pink-400', bg: 'bg-pink-500/10' },
-  twitter: { label: 'Twitter / X', Icon: Twitter, color: 'text-sky-400', bg: 'bg-sky-500/10' },
-  linkedin: { label: 'LinkedIn', Icon: Linkedin, color: 'text-indigo-400', bg: 'bg-indigo-500/10' },
-  tiktok: { label: 'TikTok', Icon: TikTokIcon, color: 'text-teal-400', bg: 'bg-teal-500/10' },
-  blog: { label: 'Blog', Icon: BookOpen, color: 'text-orange-400', bg: 'bg-orange-500/10' },
+  website: { label: 'Website', Icon: Globe, color: 'text-green-600', bg: 'bg-green-500/10' },
+  facebook: { label: 'Facebook', Icon: Facebook, color: 'text-blue-600', bg: 'bg-blue-500/10' },
+  instagram: { label: 'Instagram', Icon: Instagram, color: 'text-pink-600', bg: 'bg-pink-500/10' },
+  twitter: { label: 'Twitter / X', Icon: Twitter, color: 'text-sky-600', bg: 'bg-sky-500/10' },
+  linkedin: { label: 'LinkedIn', Icon: Linkedin, color: 'text-indigo-600', bg: 'bg-indigo-500/10' },
+  tiktok: { label: 'TikTok', Icon: TikTokIcon, color: 'text-teal-600', bg: 'bg-teal-500/10' },
+  blog: { label: 'Blog', Icon: BookOpen, color: 'text-orange-600', bg: 'bg-orange-500/10' },
 }
 
 const ORDER = ['website', 'facebook', 'instagram', 'twitter', 'linkedin', 'tiktok', 'blog']
