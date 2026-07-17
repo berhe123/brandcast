@@ -2,18 +2,23 @@ const express = require('express');
 const router = express.Router();
 const {
   generateContent,
+  generateMonthly,
+  researchBrand,
   getSamplePosts,
   getTemplates,
   getHistory,
   deleteHistoryItem,
+  updateHistoryItem,
   getAiStatus,
   getModels
 } = require('../controllers/contentController');
 const { requireAuth } = require('../middleware/auth');
 
-// Generating and reading personal history require a signed-in user.
 router.post('/generate', requireAuth, generateContent);
+router.post('/monthly', requireAuth, generateMonthly);
+router.post('/mcp/research', requireAuth, researchBrand);
 router.get('/history', requireAuth, getHistory);
+router.patch('/history/:id', requireAuth, updateHistoryItem);
 router.delete('/history/:id', requireAuth, deleteHistoryItem);
 
 // Public, read-only catalog/status endpoints.

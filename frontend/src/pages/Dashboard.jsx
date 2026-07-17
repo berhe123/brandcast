@@ -4,13 +4,14 @@ import { motion } from 'framer-motion'
 import {
   Plus, Globe, Facebook, Instagram, Twitter, Linkedin, BookOpen,
   Sparkles, GitMerge, CalendarClock, TrendingUp, ArrowRight,
-  Wand2, BarChart3, Clock, CheckCircle2, Layers, Zap, Link as LinkIcon
+  Wand2, BarChart3, Clock, CheckCircle2, Layers, Zap, Link as LinkIcon,
+  Trash2, Pencil, X
 } from 'lucide-react'
 import { TikTokIcon } from '../components/PlatformIcons'
 import ChannelLinks from '../components/ChannelLinks'
 import { useApp } from '../context/AppContext'
 import { useAuth } from '../context/AuthContext'
-import { getAnalytics, getHistory, getScheduled } from '../services/api'
+import { getAnalytics, getHistory, getScheduled, researchBrandMcp, deleteHistoryItem, updateHistoryItem } from '../services/api'
 import toast from 'react-hot-toast'
 
 const platforms = [
@@ -43,10 +44,6 @@ const normalizeUrl = (url) => {
   return /^https?:\/\//i.test(t) ? t : `https://${t}`
 }
 
-const greeting = () => {
-  const h = new Date().getHours()
-  return h < 12 ? 'Good morning' : h < 18 ? 'Good afternoon' : 'Good evening'
-}
 const fmtRelative = (iso) => {
   const diff = Date.now() - new Date(iso).getTime()
   const m = Math.round(diff / 60000)
@@ -89,6 +86,11 @@ export default function Dashboard() {
   const [recent, setRecent] = useState([])
   const [upcoming, setUpcoming] = useState([])
   const [loading, setLoading] = useState(true)
+  const [savingBrand, setSavingBrand] = useState(false)
+  const [mcpPreview, setMcpPreview] = useState(null)
+  const [editing, setEditing] = useState(null) // history item being edited
+  const [editDraft, setEditDraft] = useState({ topic: '', content: '' })
+  const [savingEdit, setSavingEdit] = useState(false)
 
   useEffect(() => {
     if (showRightAddForm) return
@@ -104,24 +106,59 @@ export default function Dashboard() {
     return () => { active = false }
   }, [showRightAddForm])
 
-  const handleAddBrand = () => {
+  const handleAddBrand = async () => {
     if (!form.name.trim()) {
       toast.error('Please enter a brand name.')
       return
     }
-    const newBrand = {
-      id: createId(),
-      name: form.name.trim(),
-      website: normalizeUrl(form.website),
-      description: form.description.trim(),
-      facebook: normalizeUrl(form.facebook), instagram: normalizeUrl(form.instagram), twitter: normalizeUrl(form.twitter),
-      linkedin: normalizeUrl(form.linkedin), tiktok: normalizeUrl(form.tiktok), blog: normalizeUrl(form.blog),
-      createdAt: Date.now(), updatedAt: Date.now()
+    setSavingBrand(true)
+    let mcp = null
+    const website = normalizeUrl(form.website)
+    try {
+      if (website) {
+        toast.loading('Marketing Context Protocol researching your website…', { id: 'mcp' })
+        const res = await researchBrandMcp({
+          website,
+          name: form.name.trim(),
+          description: form.description.trim(),
+        })
+        mcp = res.data?.mcp || null
+        setMcpPreview(mcp)
+        toast.success(mcp?.source === 'website' ? 'Brand studied from website' : 'Brand profile ready (fallback)', { id: 'mcp' })
+      }
+      const newBrand = {
+        id: createId(),
+        name: form.name.trim(),
+        website,
+        description: form.description.trim() || mcp?.description || '',
+        facebook: normalizeUrl(form.facebook), instagram: normalizeUrl(form.instagram), twitter: normalizeUrl(form.twitter),
+        linkedin: normalizeUrl(form.linkedin), tiktok: normalizeUrl(form.tiktok), blog: normalizeUrl(form.blog),
+        mcp,
+        createdAt: Date.now(), updatedAt: Date.now()
+      }
+      addBrand(newBrand)
+      setForm(initialForm)
+      toast.success('Brand added successfully.')
+      navigate(`/app/brand/${newBrand.id}/content`)
+    } catch (err) {
+      toast.error(err.message || 'Could not research brand', { id: 'mcp' })
+      // Still allow save without MCP if research fails
+      const newBrand = {
+        id: createId(),
+        name: form.name.trim(),
+        website,
+        description: form.description.trim(),
+        facebook: normalizeUrl(form.facebook), instagram: normalizeUrl(form.instagram), twitter: normalizeUrl(form.twitter),
+        linkedin: normalizeUrl(form.linkedin), tiktok: normalizeUrl(form.tiktok), blog: normalizeUrl(form.blog),
+        mcp: null,
+        createdAt: Date.now(), updatedAt: Date.now()
+      }
+      addBrand(newBrand)
+      setForm(initialForm)
+      navigate(`/app/brand/${newBrand.id}/content`)
+    } finally {
+      setSavingBrand(false)
     }
-    addBrand(newBrand)
-    setForm(initialForm)
-    toast.success('Brand added successfully.')
-    navigate(`/app/brand/${newBrand.id}/content`)
   }
 
   const goCreate = () => {
@@ -138,7 +175,7 @@ export default function Dashboard() {
         <div>
           <h2 className="text-2xl font-bold text-slate-900">Add a brand</h2>
           <p className="text-slate-500 text-sm mt-1">
-            Name your brand, describe it so the AI matches its voice, and connect its channels.
+            Add your website — Marketing Context Protocol studies the company automatically. CRM, databases, and apps are built into generation (Model Context Protocol). No separate integrations setup.
           </p>
         </div>
 
@@ -150,11 +187,11 @@ export default function Dashboard() {
               <input
                 type="text" autoFocus value={form.name}
                 onChange={(e) => setForm((p) => ({ ...p, name: e.target.value }))}
-                placeholder="e.g. Falcon Marketing" className="input-field w-full"
+                placeholder="e.g. Harbor Roast Coffee" className="input-field w-full"
               />
             </div>
             <div>
-              <label className="label flex items-center gap-1.5"><LinkIcon size={14} className="text-slate-400" /> Website <span className="text-slate-400 font-normal">· optional</span></label>
+              <label className="label flex items-center gap-1.5"><LinkIcon size={14} className="text-slate-400" /> Website <span className="text-green-600 font-normal">· Marketing Context</span></label>
               <input
                 type="url" value={form.website}
                 onChange={(e) => setForm((p) => ({ ...p, website: e.target.value }))}
@@ -168,11 +205,17 @@ export default function Dashboard() {
               value={form.description}
               onChange={(e) => setForm((p) => ({ ...p, description: e.target.value }))}
               rows={2}
-              placeholder="e.g. A sustainable activewear brand for everyday athletes. Friendly, bold, eco-conscious voice."
+              placeholder="e.g. A neighborhood coffee shop. Warm, local, quality-obsessed voice."
               className="input-field w-full text-sm"
             />
-            <p className="text-xs text-slate-500 mt-1">The AI uses this to write on-brand content.</p>
+            <p className="text-xs text-slate-500 mt-1">Marketing Context Protocol merges this with website research.</p>
           </div>
+          {mcpPreview && (
+            <div className="rounded-xl border border-green-500/25 bg-green-500/10 p-4 text-sm text-slate-700">
+              <p className="font-semibold text-green-800 mb-1">Marketing Context snapshot</p>
+              <p className="text-xs">{mcpPreview.summary}</p>
+            </div>
+          )}
         </div>
 
         {/* Channels */}
@@ -198,8 +241,8 @@ export default function Dashboard() {
 
         {/* Centered action */}
         <div className="flex justify-center">
-          <button onClick={handleAddBrand} className="btn-primary py-3 px-12 text-base">
-            <Plus size={18} /> Add brand
+          <button onClick={handleAddBrand} disabled={savingBrand} className="btn-primary py-3 px-12 text-base">
+            {savingBrand ? <><div className="spinner" /> Studying brand…</> : <><Plus size={18} /> Add brand</>}
           </button>
         </div>
       </div>
@@ -224,7 +267,7 @@ export default function Dashboard() {
           <div>
             <p className="text-xs uppercase tracking-[0.3em] text-green-700/80 font-semibold mb-1">Dashboard</p>
             <h2 className="text-2xl md:text-3xl font-bold text-slate-900">
-              {greeting()}, {user?.name?.split(' ')[0] || 'there'} 👋
+              Welcome, {user?.name?.split(' ')[0] || 'there'} 👋
             </h2>
             <p className="text-slate-600 mt-1 max-w-xl">
               Your AI marketing command center — route each post to the best model, fuse two for higher quality, then schedule across every channel.
@@ -284,7 +327,7 @@ export default function Dashboard() {
                 const Icon = meta.Icon
                 const hybrid = item.routing?.mode === 'hybrid'
                 return (
-                  <div key={item.id} className="flex items-start gap-3 py-3">
+                  <div key={item.id} className="flex items-start gap-3 py-3 group">
                     <div className={`w-9 h-9 rounded-lg ${meta.bg} flex items-center justify-center flex-shrink-0`}>
                       <Icon size={16} className={meta.color} />
                     </div>
@@ -298,6 +341,39 @@ export default function Dashboard() {
                         )}
                       </div>
                       <p className="text-xs text-slate-500 truncate">{modelLabel(item.routing)} · {fmtRelative(item.createdAt)}</p>
+                      {item.content && (
+                        <p className="text-xs text-slate-400 mt-1 line-clamp-2">{item.content}</p>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-1 flex-shrink-0 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
+                      <button
+                        type="button"
+                        title="Edit"
+                        className="btn-ghost py-1.5 px-2 text-xs"
+                        onClick={() => {
+                          setEditing(item)
+                          setEditDraft({ topic: item.topic || '', content: item.content || '' })
+                        }}
+                      >
+                        <Pencil size={13} />
+                      </button>
+                      <button
+                        type="button"
+                        title="Delete"
+                        className="btn-ghost py-1.5 px-2 text-xs text-red-600"
+                        onClick={async () => {
+                          if (!window.confirm('Delete this content?')) return
+                          try {
+                            await deleteHistoryItem(item.id)
+                            setRecent((prev) => prev.filter((r) => r.id !== item.id))
+                            toast.success('Content deleted')
+                          } catch (err) {
+                            toast.error(err.message || 'Could not delete')
+                          }
+                        }}
+                      >
+                        <Trash2 size={13} />
+                      </button>
                     </div>
                   </div>
                 )
@@ -305,6 +381,62 @@ export default function Dashboard() {
             </div>
           )}
         </div>
+
+        {/* Edit modal */}
+        {editing && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm">
+            <div className="card w-full max-w-lg p-5 space-y-4 shadow-2xl">
+              <div className="flex items-center justify-between">
+                <h3 className="font-semibold text-slate-900">Edit content</h3>
+                <button type="button" className="btn-ghost py-1.5 px-2" onClick={() => setEditing(null)}>
+                  <X size={16} />
+                </button>
+              </div>
+              <div>
+                <label className="label text-xs">Topic</label>
+                <input
+                  className="input-field w-full text-sm"
+                  value={editDraft.topic}
+                  onChange={(e) => setEditDraft((p) => ({ ...p, topic: e.target.value }))}
+                />
+              </div>
+              <div>
+                <label className="label text-xs">Post text</label>
+                <textarea
+                  className="input-field w-full text-sm min-h-[160px]"
+                  value={editDraft.content}
+                  onChange={(e) => setEditDraft((p) => ({ ...p, content: e.target.value }))}
+                />
+              </div>
+              <div className="flex justify-end gap-2">
+                <button type="button" className="btn-ghost py-2 px-4" onClick={() => setEditing(null)}>Cancel</button>
+                <button
+                  type="button"
+                  className="btn-primary py-2 px-4"
+                  disabled={savingEdit}
+                  onClick={async () => {
+                    setSavingEdit(true)
+                    try {
+                      const res = await updateHistoryItem(editing.id, {
+                        topic: editDraft.topic,
+                        content: editDraft.content,
+                      })
+                      setRecent((prev) => prev.map((r) => (r.id === editing.id ? { ...r, ...res.data } : r)))
+                      toast.success('Content updated')
+                      setEditing(null)
+                    } catch (err) {
+                      toast.error(err.message || 'Could not save')
+                    } finally {
+                      setSavingEdit(false)
+                    }
+                  }}
+                >
+                  {savingEdit ? <div className="spinner" /> : 'Save changes'}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* AI model usage — the moat */}
         <div className="card p-5">

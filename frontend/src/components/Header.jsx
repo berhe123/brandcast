@@ -9,7 +9,8 @@ const pageTitles = {
   '/app/templates': { title: 'Templates', subtitle: 'Ready-made content templates' },
   '/app/schedule': { title: 'Schedule', subtitle: 'Plan and publish across every channel' },
   '/app/analytics': { title: 'Analytics', subtitle: 'Performance and AI model insights' },
-  '/app/team': { title: 'Team', subtitle: 'Manage members and access' },
+  '/app/team': { title: 'Users', subtitle: 'Control who signed in to Brandcast' },
+  '/app/users': { title: 'Users', subtitle: 'Control who signed in to Brandcast' },
   '/app/brand/:brandId/content': { title: 'Create Content', subtitle: 'Generate AI-powered posts' },
 }
 
@@ -26,7 +27,7 @@ export default function Header({ onMenuClick }) {
     return () => document.removeEventListener('mousedown', onClick)
   }, [])
 
-  let page = { title: 'VibePost', subtitle: 'AI Content Studio' }
+  let page = { title: 'Brandcast', subtitle: 'AI Content Studio' }
   if (pageTitles[location.pathname]) page = pageTitles[location.pathname]
   else if (location.pathname.match(/\/app\/brand\/.*\/content/)) page = pageTitles['/app/brand/:brandId/content']
 
@@ -72,10 +73,10 @@ export default function Header({ onMenuClick }) {
               </div>
               {user?.role === 'admin' && (
                 <button
-                  onClick={() => { setOpen(false); navigate('/app/team') }}
+                  onClick={() => { setOpen(false); navigate('/app/users') }}
                   className="w-full text-left px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 transition-colors flex items-center gap-2"
                 >
-                  <User size={14} /> Manage team
+                  <ShieldCheck size={14} className="text-green-600" /> Manage users
                 </button>
               )}
               <button

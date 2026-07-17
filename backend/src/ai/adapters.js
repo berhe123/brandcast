@@ -35,11 +35,24 @@ const clamp = (text, platform) => {
 const buildPrompt = (model, params) => {
   const { platform, topic, tone, contentType, targetAudience, language, includeHashtags, includeEmoji, customInstructions, brandInfo } = params;
   const b = brandInfo || {};
+  const mcpBlock = b.mcp
+    ? `
+MODEL CONTEXT + MARKETETING CONTEXT PROTOCOL:
+- Industry: ${b.industry || b.mcp.industry || 'n/a'}
+- Audience: ${b.audience || b.mcp.audience || targetAudience}
+- Voice: ${b.voice || b.mcp.voice || ''}
+- Tagline: ${b.tagline || b.mcp.tagline || ''}
+- Values: ${(b.values || b.mcp.values || []).join(', ')}
+- Offerings: ${(b.offerings || b.mcp.offerings || []).slice(0, 6).join('; ')}
+- Keywords: ${(b.keywords || b.mcp.keywords || []).slice(0, 10).join(', ')}
+- Research summary: ${b.mcp.summary || ''}
+`
+    : '';
   return `You are an expert social media copywriter for ${b.name || 'the brand'}.
 BRAND: ${b.description || ''} | Voice: ${b.voice || ''} | Tagline: "${b.tagline || ''}"
-TASK: Write a ${contentType} for ${platform} about "${topic}".
+${mcpBlock}TASK: Write a ${contentType} for ${platform} about "${topic}".
 SETTINGS: tone=${tone}; audience=${targetAudience}; language=${language}; hashtags=${includeHashtags ? 'yes' : 'no'}; emojis=${includeEmoji ? 'yes' : 'no'}.
-RULES: Output ONLY the ready-to-post content. Respect ${platform}'s norms and length. ${language === 'german' ? 'Write entirely in German.' : 'Write in English.'}${customInstructions ? ` Special: ${customInstructions}` : ''}
+RULES: Output ONLY the ready-to-post content. Respect ${platform}'s norms and length. Stay tightly on-brand using Marketing Context Protocol and Model Context Protocol research when provided. ${language === 'german' ? 'Write entirely in German.' : 'Write in English.'}${customInstructions ? ` Special: ${customInstructions}` : ''}
 Write the post now:`;
 };
 

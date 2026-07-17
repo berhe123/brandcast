@@ -2,25 +2,31 @@ import React, { useState, useEffect, useCallback } from 'react'
 import { useParams, useLocation, useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
-  Facebook, Instagram, Twitter, Linkedin, Wand2, Copy, CheckCircle,
+  Facebook, Instagram, Twitter, Linkedin, Copy, CheckCircle,
   RefreshCw, ChevronDown, Sparkles, AlertCircle, Hash, Smile,
-  Cpu, Zap, KeyRound, BookOpen, CalendarClock, Send, ExternalLink
+  Cpu, Zap, BookOpen, CalendarClock, Send, ExternalLink, CalendarRange
 } from 'lucide-react'
 import { TikTokIcon } from '../components/PlatformIcons'
 import toast from 'react-hot-toast'
-import { generateContent, getAiStatus, createScheduled } from '../services/api'
+import { generateContent, generateMonthlyPlan, getAiStatus, createScheduled } from '../services/api'
 import { useApp } from '../context/AppContext'
 import ContentPreview from '../components/ContentPreview'
 import RoutingPanel from '../components/RoutingPanel'
+import MonthlyPlanBoard from '../components/MonthlyPlanBoard'
 
-// Build the brand context the AI uses, from the selected brand.
+// Build the brand context the AI uses, from the selected brand (+ MCP profile).
 const brandInfoFrom = (brand) => ({
   name: brand?.name || 'the brand',
-  description: brand?.description || '',
+  description: brand?.description || brand?.mcp?.description || '',
   website: brand?.website || brand?.blog || '',
-  voice: '',
-  tagline: '',
-  values: [],
+  voice: brand?.mcp?.voice || '',
+  tagline: brand?.mcp?.tagline || '',
+  values: brand?.mcp?.values || [],
+  industry: brand?.mcp?.industry,
+  audience: brand?.mcp?.audience,
+  offerings: brand?.mcp?.offerings || [],
+  keywords: brand?.mcp?.keywords || [],
+  mcp: brand?.mcp || null,
 })
 
 // Default the scheduler to ~1 hour from now, formatted for <input type=datetime-local>.
@@ -150,6 +156,8 @@ export default function Generate() {
   })
 
   const [loading, setLoading] = useState(false)
+  const [monthlyLoading, setMonthlyLoading] = useState(false)
+  const [monthlyPlan, setMonthlyPlan] = useState(null)
   const [result, setResult] = useState(null)
   const [meta, setMeta] = useState(null) // { routing, drafts } from the AI router
   const [copied, setCopied] = useState(false)
@@ -194,6 +202,7 @@ export default function Generate() {
     setLoading(true)
     setResult(null)
     setMeta(null)
+    setMonthlyPlan(null)
     try {
       // The AI router always runs in 'auto' mode: it picks the single best model
       // — or fuses two complementary models — for the best result automatically.
@@ -213,6 +222,34 @@ export default function Generate() {
       setLoading(false)
     }
   }, [form, brand, addToHistory])
+
+  const handleMonthlyGenerate = useCallback(async () => {
+    if (!form.topic.trim() || form.topic.trim().length < 8) {
+      toast.error('Describe a monthly goal — e.g. “I own a coffee shop and I want more customers”')
+      return
+    }
+    setMonthlyLoading(true)
+    setMonthlyPlan(null)
+    setResult(null)
+    setMeta(null)
+    try {
+      const res = await generateMonthlyPlan({
+        goal: form.topic.trim(),
+        brandInfo: brandInfoFrom(brand),
+        brand,
+        mcp: brand?.mcp || null,
+        language: form.language,
+        includeHashtags: form.includeHashtags,
+        includeEmoji: form.includeEmoji,
+      })
+      setMonthlyPlan(res.data)
+      toast.success(`Monthly plan ready · ${res.data.postCount} posts`)
+    } catch (err) {
+      toast.error(err.message || 'Failed to build monthly plan')
+    } finally {
+      setMonthlyLoading(false)
+    }
+  }, [form, brand])
 
   const handleCopy = () => {
     if (!result) return
@@ -332,12 +369,17 @@ export default function Generate() {
             <textarea
               value={form.topic}
               onChange={e => setForm(prev => ({ ...prev, topic: e.target.value }))}
-              placeholder="e.g. 'Announce our new spring collection' or 'Share 3 tips our customers love'"
+              placeholder="e.g. 'Announce our spring menu' — or for a month: 'I own a coffee shop and I want more customers, create a month of content'"
               rows={3}
               className="input-field text-sm"
-              maxLength={300}
+              maxLength={500}
             />
-            <p className="text-right text-xs text-slate-500 mt-1">{form.topic.length}/300</p>
+            <p className="text-right text-xs text-slate-500 mt-1">{form.topic.length}/500</p>
+            <p className="mt-2 text-xs text-green-800 bg-green-500/10 border border-green-500/20 rounded-lg px-3 py-2">
+              Context is automatic — Marketing Context Protocol
+              {brand?.mcp ? ` · ${brand.mcp.industry} · ${brand.mcp.audience}` : ' (from your brand website)'}
+              {' · '}Model Context Protocol (CRM, databases, apps) built in
+            </p>
           </div>
 
           {/* Tone & Type */}
@@ -466,33 +508,67 @@ export default function Generate() {
             </AnimatePresence>
           </div>
 
-          {/* Generate Button */}
-          <motion.button
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.97 }}
-            onClick={handleGenerate}
-            disabled={loading || !form.topic.trim()}
-            className="btn-primary w-full py-4 text-base"
-          >
-            {loading ? (
-              <>
-                <div className="spinner" />
-                Generating with AI...
-              </>
-            ) : (
-              <>
-                <Sparkles size={20} />
-                Generate Content
-              </>
-            )}
-          </motion.button>
+          {/* Generate actions */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.97 }}
+              onClick={handleGenerate}
+              disabled={loading || monthlyLoading || !form.topic.trim()}
+              className="btn-primary w-full py-4 text-base"
+            >
+              {loading ? (
+                <>
+                  <div className="spinner" />
+                  Generating…
+                </>
+              ) : (
+                <>
+                  <Sparkles size={20} />
+                  Generate Content
+                </>
+              )}
+            </motion.button>
+
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.97 }}
+              onClick={handleMonthlyGenerate}
+              disabled={loading || monthlyLoading || form.topic.trim().length < 8}
+              className="w-full py-4 text-base rounded-xl font-semibold text-white shadow-lg shadow-emerald-900/20
+                bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600
+                hover:from-emerald-500 hover:via-teal-500 hover:to-cyan-500
+                disabled:opacity-50 disabled:cursor-not-allowed
+                flex items-center justify-center gap-2 transition-all"
+            >
+              {monthlyLoading ? (
+                <>
+                  <div className="spinner" />
+                  Building month…
+                </>
+              ) : (
+                <>
+                  <CalendarRange size={20} />
+                  Generate Monthly Plan
+                </>
+              )}
+            </motion.button>
+          </div>
+          <p className="text-xs text-slate-500 text-center -mt-2">
+            Monthly plan creates <span className="text-slate-700 font-medium">8–15 posts</span> across 4 weeks, mixed by platform and angle.
+          </p>
         </div>
 
         {/* RIGHT: Preview */}
         <div className="space-y-4">
-          {/* AI Router decision */}
-          {meta?.routing && <RoutingPanel routing={meta.routing} drafts={meta.drafts} />}
+          {(monthlyLoading || monthlyPlan) && (
+            <MonthlyPlanBoard plan={monthlyPlan} brand={brand} loading={monthlyLoading} />
+          )}
 
+          {/* AI Router decision */}
+          {meta?.routing && !monthlyPlan && <RoutingPanel routing={meta.routing} drafts={meta.drafts} />}
+
+          {!monthlyPlan && !monthlyLoading && (
           <div className="card p-5 sticky top-0">
             <div className="flex items-center justify-between mb-4">
               <h3 className="font-semibold text-slate-900 flex items-center gap-2">
@@ -586,6 +662,7 @@ export default function Generate() {
               </motion.div>
             )}
           </div>
+          )}
         </div>
       </div>
     </div>

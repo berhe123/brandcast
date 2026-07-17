@@ -1,7 +1,7 @@
 /**
- * Demo data for VibePost
+ * Demo data for Brandcast
  * -----------------------
- * VibePost is brand-agnostic: real content is generated against whatever brand
+ * Brandcast is brand-agnostic: real content is generated against whatever brand
  * the user creates. The objects below are only used for the demo/sample feeds
  * and as a neutral fallback brand context, so the product showcases well out of
  * the box without being tied to any real company.

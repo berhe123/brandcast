@@ -1,8 +1,7 @@
 import React from 'react'
 
 /**
- * VibePost brand mark — a green rounded tile carrying a bold "V".
- * `size` controls the tile in px. Reads well on light and dark surfaces.
+ * Brandcast mark — green tile with a bold "B".
  */
 export function LogoMark({ size = 36, className = '' }) {
   return (
@@ -11,12 +10,10 @@ export function LogoMark({ size = 36, className = '' }) {
       style={{ width: size, height: size }}
       aria-hidden="true"
     >
-      {/* Soft green glow */}
       <span
         className="absolute inset-0 rounded-[28%] blur-[6px] opacity-60"
         style={{ background: 'linear-gradient(135deg, #22c55e, #16a34a 55%, #0d9488)' }}
       />
-      {/* Tile */}
       <span
         className="relative inline-flex items-center justify-center rounded-[28%] ring-1 ring-white/30 shadow-lg"
         style={{
@@ -29,22 +26,22 @@ export function LogoMark({ size = 36, className = '' }) {
           className="font-display font-extrabold text-white leading-none"
           style={{ fontSize: size * 0.58, marginTop: -size * 0.02 }}
         >
-          V
+          B
         </span>
       </span>
     </span>
   )
 }
 
-export default function Logo({ size = 36, subtitle = 'AI Content Studio', className = '', onLight = true }) {
+export default function Logo({ size = 36, subtitle = 'AI Marketing Studio', className = '', onLight = true }) {
   const titleColor = onLight ? 'text-slate-900' : 'text-white'
   const subColor = onLight ? 'text-slate-500' : 'text-slate-400'
   return (
     <div className={`flex items-center gap-2.5 ${className}`}>
       <LogoMark size={size} />
       <div className="leading-tight">
-        <p className={`font-display font-bold tracking-tight ${titleColor}`} style={{ fontSize: size * 0.46 }}>
-          VibePost
+        <p className={`font-display font-bold tracking-tight ${titleColor}`} style={{ fontSize: size * 0.42 }}>
+          Brandcast
         </p>
         {subtitle && <p className={`${subColor} text-xs`}>{subtitle}</p>}
       </div>

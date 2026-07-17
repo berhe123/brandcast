@@ -56,6 +56,7 @@ function App() {
           <Route path="schedule" element={<Schedule />} />
           <Route path="analytics" element={<Analytics />} />
           <Route path="team" element={<AdminOnly><Team /></AdminOnly>} />
+          <Route path="users" element={<AdminOnly><Team /></AdminOnly>} />
         </Route>
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>

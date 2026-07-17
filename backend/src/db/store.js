@@ -17,7 +17,7 @@ const crypto = require('crypto');
 const DATA_DIR = path.resolve(__dirname, '../../.data');
 const DATA_FILE = path.join(DATA_DIR, 'db.json');
 
-const EMPTY = { users: [], content: [], scheduled: [], events: [] };
+const EMPTY = { users: [], content: [], scheduled: [], events: [], integrations: [] };
 
 let db = null;
 let saveTimer = null;
@@ -87,6 +87,7 @@ module.exports = {
   content: collection('content'),
   scheduled: collection('scheduled'),
   events: collection('events'),
+  integrations: collection('integrations'),
   newId: id,
   _DATA_FILE: DATA_FILE,
 };

@@ -29,7 +29,7 @@ export default function MarketingHeader() {
   return (
     <header className="sticky top-0 z-50 border-b border-slate-300/70 bg-[#dae1e3]/85 backdrop-blur-xl safe-top">
       <div className="max-w-6xl mx-auto px-5 sm:px-6 h-16 flex items-center justify-between">
-        <Link to="/" className="shrink-0" aria-label="VibePost home">
+        <Link to="/" className="shrink-0" aria-label="Brandcast home">
           <Logo size={34} subtitle={null} />
         </Link>
 

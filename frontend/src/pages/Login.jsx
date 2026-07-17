@@ -1,15 +1,14 @@
 import React, { useState } from 'react'
 import { useNavigate, useLocation, Navigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { ArrowRight, ArrowLeft, Loader2, Mail, ShieldCheck, X, Plus, MailCheck } from 'lucide-react'
+import { ArrowRight, Loader2, Mail, ShieldCheck, X, Plus } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { useAuth } from '../context/AuthContext'
-import { startEmailLogin, verifyEmailLogin, loginWithGoogle } from '../services/api'
+import { loginWithEmail, loginWithGoogle } from '../services/api'
 import { LogoMark } from '../components/Logo'
 import MarketingHeader from '../components/MarketingHeader'
 import MarketingFooter from '../components/MarketingFooter'
 
-// Inline Google "G" mark (lucide has no brand logo).
 function GoogleIcon({ size = 18 }) {
   return (
     <svg width={size} height={size} viewBox="0 0 48 48" aria-hidden="true">
@@ -29,29 +28,21 @@ export default function Login() {
   const location = useLocation()
   const from = location.state?.from?.pathname || '/app/dashboard'
 
-  const [step, setStep] = useState('email') // 'email' | 'code'
   const [email, setEmail] = useState('')
-  const [code, setCode] = useState('')
-  const [sent, setSent] = useState(false)        // true once a code request returns
-  const [delivered, setDelivered] = useState(false) // true if a real email went out
-  const [devCode, setDevCode] = useState('')     // demo-only fallback, hidden until revealed
-  const [showDev, setShowDev] = useState(false)
   const [busy, setBusy] = useState(false)
 
-  // Google account-chooser state (mirrors the real Google "Choose an account" UX).
+  // Google account-chooser state (same UX as the original login)
   const [chooser, setChooser] = useState(false)
   const [newGoogle, setNewGoogle] = useState(false)
   const [googleEmail, setGoogleEmail] = useState('')
 
   if (user) return <Navigate to={from} replace />
 
-  // Only ever reaches the dashboard after a verified login — never on email entry alone.
   const finish = (data) => {
     authenticate(data)
     navigate(from, { replace: true })
   }
 
-  // ── Google ────────────────────────────────────────────────────────────────
   const recentAccounts = email.trim() && /\S+@\S+\.\S+/.test(email.trim())
     ? [{ email: email.trim(), name: email.trim().split('@')[0] }]
     : []
@@ -77,40 +68,17 @@ export default function Login() {
     chooseGoogle({ email: value, name: value.split('@')[0] })
   }
 
-  // ── Email code ──────────────────────────────────────────────────────────────
+  // Direct login — no verification code
   const handleEmailContinue = async (e) => {
     e?.preventDefault?.()
     const value = email.trim()
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) return toast.error('Please enter a valid email address')
     setBusy(true)
     try {
-      const res = await startEmailLogin(value)
-      setDelivered(Boolean(res.data.delivered))
-      setDevCode(res.data.devCode || '')
-      setShowDev(false)
-      setSent(true)
-      setStep('code')
-      toast.success(
-        res.data.delivered
-          ? `We emailed a 6-digit code to ${value}.`
-          : `Code generated. Configure an email provider to receive it in your inbox.`
-      )
-    } catch (err) {
-      toast.error(err.message || 'Could not send a code')
-    } finally {
-      setBusy(false)
-    }
-  }
-
-  const handleVerify = async (e) => {
-    e.preventDefault()
-    if (code.trim().length < 6) return toast.error('Enter the 6-digit code')
-    setBusy(true)
-    try {
-      const res = await verifyEmailLogin(email.trim(), code.trim())
+      const res = await loginWithEmail(value)
       finish(res.data)
     } catch (err) {
-      toast.error(err.message || 'Invalid code')
+      toast.error(err.message || 'Could not sign in')
     } finally {
       setBusy(false)
     }
@@ -129,130 +97,56 @@ export default function Login() {
         <div className="relative w-full max-w-[420px]">
           <div className="flex flex-col items-center mb-7">
             <LogoMark size={52} className="mb-4" />
-            <h1 className="text-2xl font-display font-bold text-slate-900 tracking-tight">Welcome to VibePost</h1>
+            <h1 className="text-2xl font-display font-bold text-slate-900 tracking-tight">Welcome to Brandcast</h1>
             <p className="text-slate-600 text-sm mt-1 text-center">
-              {step === 'email' ? 'Sign in to your content studio' : 'Check your email'}
+              Sign in to your content studio
             </p>
           </div>
 
           <div className="rounded-3xl border border-slate-200 bg-white/90 backdrop-blur-xl p-6 sm:p-7 shadow-xl">
-            <AnimatePresence mode="wait">
-              {step === 'email' ? (
-                <motion.div
-                  key="email"
-                  initial={{ opacity: 0, x: -8 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -8 }}
-                >
-                  <button
-                    onClick={() => setChooser(true)}
-                    disabled={busy}
-                    className="w-full flex items-center justify-center gap-3 py-3 rounded-xl bg-white text-slate-800 font-semibold text-sm border border-slate-300 hover:bg-slate-50 transition-colors disabled:opacity-60"
-                  >
-                    <GoogleIcon /> Continue with Google
-                  </button>
+            <motion.div
+              initial={{ opacity: 0, x: -8 }}
+              animate={{ opacity: 1, x: 0 }}
+            >
+              <button
+                onClick={() => setChooser(true)}
+                disabled={busy}
+                className="w-full flex items-center justify-center gap-3 py-3 rounded-xl bg-white text-slate-800 font-semibold text-sm border border-slate-300 hover:bg-slate-50 transition-colors disabled:opacity-60"
+              >
+                <GoogleIcon /> Continue with Google
+              </button>
 
-                  <div className="flex items-center gap-3 my-5">
-                    <div className="flex-1 h-px bg-slate-200" />
-                    <span className="text-xs text-slate-400 font-medium">OR</span>
-                    <div className="flex-1 h-px bg-slate-200" />
-                  </div>
+              <div className="flex items-center gap-3 my-5">
+                <div className="flex-1 h-px bg-slate-200" />
+                <span className="text-xs text-slate-400 font-medium">OR</span>
+                <div className="flex-1 h-px bg-slate-200" />
+              </div>
 
-                  <form onSubmit={handleEmailContinue} className="space-y-3">
-                    <label htmlFor="email" className="block text-sm font-medium text-slate-700">Email address</label>
-                    <div className="relative">
-                      <Mail size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-                      <input
-                        id="email"
-                        type="email"
-                        autoComplete="email"
-                        autoFocus
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        placeholder="you@company.com"
-                        className="input-light pl-10 w-full"
-                      />
-                    </div>
-                    <button type="submit" disabled={busy} className="btn-green w-full py-3">
-                      {busy ? <Loader2 size={18} className="animate-spin" /> : <>Continue with email <ArrowRight size={16} /></>}
-                    </button>
-                  </form>
+              <form onSubmit={handleEmailContinue} className="space-y-3">
+                <label htmlFor="email" className="block text-sm font-medium text-slate-700">Email address</label>
+                <div className="relative">
+                  <Mail size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                  <input
+                    id="email"
+                    type="email"
+                    autoComplete="email"
+                    autoFocus
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="you@company.com"
+                    className="input-light pl-10 w-full"
+                  />
+                </div>
+                <button type="submit" disabled={busy} className="btn-green w-full py-3">
+                  {busy ? <Loader2 size={18} className="animate-spin" /> : <>Continue with email <ArrowRight size={16} /></>}
+                </button>
+              </form>
 
-                  <p className="mt-4 flex items-center justify-center gap-1.5 text-xs text-slate-500">
-                    <ShieldCheck size={13} className="text-green-600" />
-                    We email you a secure 6-digit code — no password needed.
-                  </p>
-                </motion.div>
-              ) : (
-                <motion.div
-                  key="code"
-                  initial={{ opacity: 0, x: 8 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 8 }}
-                >
-                  <button
-                    onClick={() => { setStep('email'); setCode(''); setSent(false) }}
-                    className="flex items-center gap-1.5 text-xs text-slate-500 hover:text-slate-800 mb-4 transition-colors"
-                  >
-                    <ArrowLeft size={14} /> Use a different email
-                  </button>
-
-                  <div className="flex flex-col items-center text-center mb-5">
-                    <span className="w-12 h-12 rounded-2xl bg-green-500/10 border border-green-500/20 flex items-center justify-center mb-3">
-                      <MailCheck size={22} className="text-green-600" />
-                    </span>
-                    <p className="text-sm text-slate-700">
-                      We sent a 6-digit code to <span className="text-slate-900 font-semibold">{email}</span>.
-                      Enter it below to continue.
-                    </p>
-                  </div>
-
-                  {sent && !delivered && (
-                    <div className="mb-4 rounded-xl border border-amber-300 bg-amber-50 px-4 py-3 text-xs text-amber-700 leading-relaxed">
-                      <p>
-                        Email delivery isn't configured yet, so no message was sent. Add a free
-                        Resend API key on the server to receive codes in your inbox.
-                      </p>
-                      {devCode && (
-                        showDev ? (
-                          <p className="mt-2 font-mono text-sm tracking-[0.3em] text-amber-900">
-                            {devCode}
-                          </p>
-                        ) : (
-                          <button
-                            type="button"
-                            onClick={() => setShowDev(true)}
-                            className="mt-2 underline underline-offset-2 hover:text-amber-900"
-                          >
-                            Reveal demo code (so you're not locked out)
-                          </button>
-                        )
-                      )}
-                    </div>
-                  )}
-
-                  <form onSubmit={handleVerify} className="space-y-3">
-                    <input
-                      inputMode="numeric"
-                      autoComplete="one-time-code"
-                      autoFocus
-                      maxLength={6}
-                      value={code}
-                      onChange={(e) => setCode(e.target.value.replace(/\D/g, ''))}
-                      placeholder="••••••"
-                      className="input-light w-full text-center text-2xl tracking-[0.5em] font-mono"
-                    />
-                    <button type="submit" disabled={busy} className="btn-green w-full py-3">
-                      {busy ? <Loader2 size={18} className="animate-spin" /> : <>Verify & continue <ArrowRight size={16} /></>}
-                    </button>
-                  </form>
-
-                  <button
-                    onClick={handleEmailContinue}
-                    disabled={busy}
-                    className="w-full text-center text-xs text-slate-500 hover:text-slate-800 mt-4 transition-colors"
-                  >
-                    Didn't get it? Resend code
-                  </button>
-                </motion.div>
-              )}
-            </AnimatePresence>
+              <p className="mt-4 flex items-center justify-center gap-1.5 text-xs text-slate-500">
+                <ShieldCheck size={13} className="text-green-600" />
+                Instant sign-in — no password or code needed.
+              </p>
+            </motion.div>
           </div>
 
           <p className="text-center text-xs text-slate-500 mt-6">
@@ -260,7 +154,7 @@ export default function Login() {
           </p>
         </div>
 
-        {/* ── Google "Choose an account" dialog ─────────────────────────────── */}
+        {/* Google "Choose an account" dialog */}
         <AnimatePresence>
           {chooser && (
             <motion.div
@@ -292,7 +186,7 @@ export default function Login() {
 
                 <div className="px-5 pt-4 pb-2">
                   <p className="text-lg font-semibold text-slate-900">Choose an account</p>
-                  <p className="text-sm text-slate-500 mt-0.5">to continue to VibePost</p>
+                  <p className="text-sm text-slate-500 mt-0.5">to continue to Brandcast</p>
                 </div>
 
                 {!newGoogle ? (

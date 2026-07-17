@@ -67,7 +67,7 @@ export default function MarketingFooter() {
 
         <div className="mt-10 pt-6 border-t border-slate-300/70 flex flex-col sm:flex-row items-center justify-between gap-3 text-center sm:text-left">
           <p className="text-slate-500 text-sm">
-            © {new Date().getFullYear()} VibePost. All rights reserved.
+            © {new Date().getFullYear()} Brandcast. All rights reserved.
           </p>
           <p className="text-slate-500 text-sm">One account. Every platform. Zero chaos.</p>
         </div>

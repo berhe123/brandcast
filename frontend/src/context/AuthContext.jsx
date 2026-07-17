@@ -22,8 +22,8 @@ export function AuthProvider({ children }) {
   // React to a 401 from anywhere in the app.
   useEffect(() => {
     const onUnauth = () => setUser(null)
-    window.addEventListener('vibepost-unauthorized', onUnauth)
-    return () => window.removeEventListener('vibepost-unauthorized', onUnauth)
+    window.addEventListener('brandcast-unauthorized', onUnauth)
+    return () => window.removeEventListener('brandcast-unauthorized', onUnauth)
   }, [])
 
   // Called after a successful login (email-code or Google).

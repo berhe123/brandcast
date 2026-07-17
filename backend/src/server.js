@@ -16,16 +16,23 @@ const PORT = process.env.PORT || 5000;
 
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 100,
+  max: 300,
   message: { success: false, error: 'Too many requests, please try again later.' }
 });
 
+const isDev = process.env.NODE_ENV !== 'production';
+
 const allowedOrigins = [
   'http://localhost:5173',
+  'http://localhost:5182',
   'http://localhost:3000',
+  'https://brandcast.vercel.app',
   'https://vibepost.vercel.app',
 ];
 if (process.env.FRONTEND_URL) allowedOrigins.push(process.env.FRONTEND_URL);
+
+const isLocalDevOrigin = (origin) =>
+  /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin);
 
 app.use(cors({
   origin: (origin, callback) => {
@@ -33,6 +40,10 @@ app.use(cors({
     if (!origin) return callback(null, true);
     // Allow any vercel.app subdomain (covers preview deployments too)
     if (origin.endsWith('.vercel.app') || allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+    // In dev, accept any localhost port (Vite may use 5173, 5182, etc.)
+    if (isDev && isLocalDevOrigin(origin)) {
       return callback(null, true);
     }
     callback(new Error('Not allowed by CORS'));
@@ -48,11 +59,12 @@ app.use('/api/users', userRoutes);
 app.use('/api/content', contentRoutes);
 app.use('/api/schedule', scheduleRoutes);
 app.use('/api/analytics', analyticsRoutes);
+app.use('/api/mcp', require('./routes/mcpRoutes'));
 
 app.get('/api/health', (req, res) => {
   res.json({
     status: 'OK',
-    message: 'VibePost API is running',
+    message: 'Brandcast API is running',
     timestamp: new Date().toISOString()
   });
 });
@@ -61,7 +73,7 @@ app.use(errorHandler);
 
 app.listen(PORT, () => {
   startScheduler(); // background publish loop for scheduled posts
-  console.log(`\n🚀 VibePost API`);
+  console.log(`\n🚀 Brandcast API`);
   console.log(`   Server: http://localhost:${PORT}`);
   console.log(`   Environment: ${process.env.NODE_ENV || 'development'}`);
   console.log(`   Scheduler: ✅ running`);

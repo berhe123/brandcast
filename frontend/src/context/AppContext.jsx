@@ -1,44 +1,97 @@
 import React, { createContext, useContext, useState, useCallback, useEffect, useMemo } from 'react'
+import { useAuth } from './AuthContext'
 
 const AppContext = createContext(null)
-const STORAGE_KEY = 'vibepost-state'
+const LEGACY_STORAGE_KEY = 'brandcast-state'
+const OLD_LEGACY_STORAGE_KEY = 'vibepost-state'
+const storageKey = (userId) => `brandcast-state:${userId}`
+const oldStorageKey = (userId) => `vibepost-state:${userId}`
 
 const initialStats = {
   totalGenerated: 0,
   byPlatform: { facebook: 0, instagram: 0, twitter: 0, linkedin: 0, tiktok: 0 }
 }
 
-const loadStoredState = () => {
+const emptyState = () => ({
+  history: [],
+  stats: initialStats,
+  brands: [],
+  selectedBrandId: null,
+})
+
+const loadStoredState = (userId) => {
+  if (!userId) return emptyState()
   try {
-    const raw = localStorage.getItem(STORAGE_KEY)
-    if (!raw) return null
-    return JSON.parse(raw)
-  } catch (err) {
-    return null
+    const key = storageKey(userId)
+    let raw = localStorage.getItem(key)
+
+    // One-time migration from older shared / vibepost keys.
+    if (!raw) {
+      const legacy =
+        localStorage.getItem(LEGACY_STORAGE_KEY) ||
+        localStorage.getItem(OLD_LEGACY_STORAGE_KEY) ||
+        localStorage.getItem(oldStorageKey(userId))
+      if (legacy) {
+        localStorage.setItem(key, legacy)
+        raw = legacy
+      }
+    }
+
+    if (!raw) return emptyState()
+    const parsed = JSON.parse(raw)
+    return {
+      history: parsed.history || [],
+      stats: parsed.stats || initialStats,
+      brands: parsed.brands || [],
+      selectedBrandId: parsed.selectedBrandId || null,
+    }
+  } catch {
+    return emptyState()
   }
 }
 
-const createId = () => `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
-
 export function AppProvider({ children }) {
-  const stored = loadStoredState()
+  const { user: authUser } = useAuth()
+  const userId = authUser?.id
 
-  const [history, setHistory] = useState(stored?.history || [])
-  const [stats, setStats] = useState(stored?.stats || initialStats)
-  const [user, setUser] = useState(stored?.user || null)
-  const [brands, setBrands] = useState(stored?.brands || [])
-  const [selectedBrandId, setSelectedBrandId] = useState(stored?.selectedBrandId || null)
+  const [history, setHistory] = useState([])
+  const [stats, setStats] = useState(initialStats)
+  const [brands, setBrands] = useState([])
+  const [selectedBrandId, setSelectedBrandId] = useState(null)
+  const [ready, setReady] = useState(false)
+
+  // Load the signed-in user's own workspace when the account changes.
+  useEffect(() => {
+    setReady(false)
+    if (!userId) {
+      const blank = emptyState()
+      setHistory(blank.history)
+      setStats(blank.stats)
+      setBrands(blank.brands)
+      setSelectedBrandId(blank.selectedBrandId)
+      setReady(true)
+      return
+    }
+
+    const stored = loadStoredState(userId)
+    setHistory(stored.history)
+    setStats(stored.stats)
+    setBrands(stored.brands)
+    setSelectedBrandId(stored.selectedBrandId)
+    setReady(true)
+  }, [userId])
 
   const selectedBrand = useMemo(() => {
     return brands.find((brand) => brand.id === selectedBrandId) || brands[0] || null
   }, [brands, selectedBrandId])
 
   useEffect(() => {
+    if (!userId || !ready) return
     localStorage.setItem(
-      STORAGE_KEY,
-      JSON.stringify({ user, brands, selectedBrandId, history, stats })
+      storageKey(userId),
+      JSON.stringify({ brands, selectedBrandId, history, stats })
     )
-  }, [user, brands, selectedBrandId, history, stats])
+  }, [userId, ready, brands, selectedBrandId, history, stats])
 
   const addToHistory = useCallback((item) => {
     setHistory((prev) => [item, ...prev].slice(0, 100))
@@ -59,17 +112,6 @@ export function AppProvider({ children }) {
     setHistory([])
   }, [])
 
-  const login = useCallback((email) => {
-    const trimmed = email?.trim().toLowerCase()
-    if (!trimmed) return false
-    setUser({ email: trimmed })
-    return true
-  }, [])
-
-  const logout = useCallback(() => {
-    setUser(null)
-  }, [])
-
   const addBrand = useCallback((brand) => {
     setBrands((prev) => [brand, ...prev])
     setSelectedBrandId(brand.id)
@@ -84,12 +126,12 @@ export function AppProvider({ children }) {
   const removeBrand = useCallback((id) => {
     setBrands((prev) => {
       const next = prev.filter((brand) => brand.id !== id)
-      if (next.length === 0) {
-        setSelectedBrandId(null)
-      }
+      setSelectedBrandId((current) => {
+        if (current === id) return next[0]?.id || null
+        return current
+      })
       return next
     })
-    setSelectedBrandId((current) => (current === id ? null : current))
   }, [])
 
   const selectBrand = useCallback((id) => {
@@ -104,9 +146,6 @@ export function AppProvider({ children }) {
       addToHistory,
       removeFromHistory,
       clearHistory,
-      user,
-      login,
-      logout,
       brands,
       selectedBrand,
       selectedBrandId,
