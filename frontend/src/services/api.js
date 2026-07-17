@@ -5,8 +5,11 @@ const TOKEN_KEY = 'brandcast-token'
 export const getToken = () => localStorage.getItem(TOKEN_KEY)
 export const setToken = (t) => (t ? localStorage.setItem(TOKEN_KEY, t) : localStorage.removeItem(TOKEN_KEY))
 
+// Local: Vite proxies /api → localhost:5000
+// Vercel: set VITE_API_URL to your Render URL (e.g. https://brandcast-api.onrender.com)
+const apiBase = (import.meta.env.VITE_API_URL || '').replace(/\/$/, '')
 const api = axios.create({
-  baseURL: '/api',
+  baseURL: apiBase ? `${apiBase}/api` : '/api',
   timeout: 180000,
   headers: { 'Content-Type': 'application/json' }
 })
