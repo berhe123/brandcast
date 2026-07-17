@@ -27,7 +27,7 @@ const navLinks = [
 export default function Sidebar({ onNavigate }) {
   const location = useLocation()
   const navigate = useNavigate()
-  const { stats, brands, selectBrand, selectedBrand, removeBrand } = useApp()
+  const { brands, selectBrand, selectedBrand, removeBrand } = useApp()
   const { isAdmin, user } = useAuth()
   const [openMenuId, setOpenMenuId] = useState(null)
 
@@ -153,28 +153,6 @@ export default function Sidebar({ onNavigate }) {
           </div>
         </div>
       </nav>
-
-      {/* Stats mini */}
-      <div className="px-4 py-4 border-t border-slate-200">
-        <div className="card p-4">
-          <p className="text-xs text-slate-500 font-medium mb-3 uppercase tracking-wide">Session Stats</p>
-          <div className="grid grid-cols-3 gap-2">
-            {[
-              { label: 'Total', value: stats.totalGenerated, color: 'text-green-600' },
-              { label: 'FB', value: stats.byPlatform.facebook || 0, color: 'text-blue-600' },
-              { label: 'IG', value: stats.byPlatform.instagram || 0, color: 'text-pink-600' },
-              { label: 'TW', value: stats.byPlatform.twitter || 0, color: 'text-sky-600' },
-              { label: 'LI', value: stats.byPlatform.linkedin || 0, color: 'text-indigo-600' },
-              { label: 'TT', value: stats.byPlatform.tiktok || 0, color: 'text-teal-600' },
-            ].map(({ label, value, color }) => (
-              <div key={label} className="text-center">
-                <p className={`text-base font-bold ${color}`}>{value}</p>
-                <p className="text-slate-500 text-xs">{label}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
     </aside>
   )
 }
