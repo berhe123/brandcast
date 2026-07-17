@@ -36,6 +36,16 @@ const updateUser = (req, res) => {
     if (target.role === 'admin' && role === 'member' && adminCount() <= 1) {
       return res.status(400).json({ success: false, error: 'There must be at least one admin.' });
     }
+    // Extra admins must be added via ADMIN_EMAILS env — UI can't grant lasting admin
+    if (role === 'admin') {
+      const { isAdminEmail } = require('../services/authService');
+      if (!isAdminEmail(target.email)) {
+        return res.status(400).json({
+          success: false,
+          error: 'Only emails in ADMIN_EMAILS can be admins. Add this email on Render, then redeploy.',
+        });
+      }
+    }
     patch.role = role;
   }
 

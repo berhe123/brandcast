@@ -10,6 +10,7 @@ const scheduleRoutes = require('./routes/scheduleRoutes');
 const analyticsRoutes = require('./routes/analyticsRoutes');
 const { errorHandler } = require('./middleware/errorHandler');
 const { start: startScheduler } = require('./services/scheduler');
+const { enforceAdminAllowlist } = require('./services/authService');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -61,6 +62,22 @@ app.use('/api/schedule', scheduleRoutes);
 app.use('/api/analytics', analyticsRoutes);
 app.use('/api/mcp', require('./routes/mcpRoutes'));
 
+app.get('/', (req, res) => {
+  res.json({
+    name: 'Brandcast API',
+    status: 'OK',
+    message: 'This is the backend API — open your Vercel frontend to use the app.',
+    health: '/api/health',
+    docs: {
+      auth: '/api/auth',
+      content: '/api/content',
+      schedule: '/api/schedule',
+      analytics: '/api/analytics',
+      mcp: '/api/mcp',
+    },
+  });
+});
+
 app.get('/api/health', (req, res) => {
   res.json({
     status: 'OK',
@@ -72,6 +89,7 @@ app.get('/api/health', (req, res) => {
 app.use(errorHandler);
 
 app.listen(PORT, () => {
+  enforceAdminAllowlist();
   startScheduler(); // background publish loop for scheduled posts
   console.log(`\n🚀 Brandcast API`);
   console.log(`   Server: http://localhost:${PORT}`);
